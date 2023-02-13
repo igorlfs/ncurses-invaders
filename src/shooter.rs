@@ -31,7 +31,7 @@ impl Shooter {
         &self.bullets
     }
 
-    pub fn clean_bullets(&mut self) {
+    pub fn clear_bullets(&mut self) {
         loop {
             if self.bullets.is_empty() {
                 return;

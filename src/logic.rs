@@ -47,18 +47,18 @@ impl Logic {
         let step = Uniform::new(0., 1.);
         let mut rng = rand::thread_rng();
 
-        for e in self.enemies.iter_mut() {
+        for enemy in self.enemies.iter_mut() {
             let choice = step.sample(&mut rng);
             if choice > DONT_FIRE_PROBABILY {
-                e.shoot();
+                enemy.shoot();
             }
         }
     }
 
     pub fn hit_player(&self) -> bool {
-        for e in self.enemies.iter() {
-            for b in e.bullets() {
-                if b.pos() == self.player.pos() {
+        for enemy in self.enemies.iter() {
+            for bullet in enemy.bullets() {
+                if bullet.pos() == self.player.pos() {
                     return true;
                 }
             }
@@ -67,22 +67,22 @@ impl Logic {
     }
 
     pub fn hit_enemies(&mut self) {
-        for b in self.player.bullets().iter() {
-            self.enemies.retain(|e| e.pos() != b.pos());
+        for bullet in self.player.bullets().iter() {
+            self.enemies.retain(|enemy| enemy.pos() != bullet.pos());
         }
     }
 
     pub fn move_bullets(&mut self) {
-        for b in self.player.bullets_mut() {
-            b.shift(&bullet::Direction::Up, &2);
+        for bullet in self.player.bullets_mut() {
+            bullet.shift(&bullet::Direction::Up, &2);
         }
-        self.player.clean_bullets();
+        self.player.clear_bullets();
 
-        for e in self.enemies.iter_mut() {
-            for b in e.bullets_mut() {
-                b.shift(&bullet::Direction::Down, &(self.height - 3));
+        for enemy in self.enemies.iter_mut() {
+            for bullet in enemy.bullets_mut() {
+                bullet.shift(&bullet::Direction::Down, &(self.height - 3));
             }
-            e.clean_bullets();
+            enemy.clear_bullets();
         }
     }
 

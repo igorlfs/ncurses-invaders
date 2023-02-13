@@ -46,8 +46,8 @@ impl Printer {
             char_bullet: ':' as u32,
             color_bullet: 1,
         };
-        for e in enemies {
-            Printer::shooter_helper(win, e, bundle);
+        for enemy in enemies {
+            Printer::shooter_helper(win, enemy, &bundle);
         }
     }
     pub fn player(win: WINDOW, player: &Shooter) {
@@ -57,10 +57,10 @@ impl Printer {
             char_bullet: '.' as u32,
             color_bullet: 4,
         };
-        Printer::shooter_helper(win, player, bundle);
+        Printer::shooter_helper(win, player, &bundle);
     }
 
-    fn shooter_helper(win: WINDOW, shooter: &Shooter, bundle: Bundle) {
+    fn shooter_helper(win: WINDOW, shooter: &Shooter, bundle: &Bundle) {
         wattron(win, COLOR_PAIR(bundle.color_shooter));
         let pos = shooter.pos();
         mvwaddch(win, pos.0, pos.1, bundle.char_shooter);
@@ -68,8 +68,8 @@ impl Printer {
 
         wattron(win, COLOR_PAIR(bundle.color_bullet));
 
-        for b in shooter.bullets() {
-            let pos = b.pos();
+        for bullet in shooter.bullets() {
+            let pos = bullet.pos();
             mvwaddch(win, pos.0, pos.1, bundle.char_bullet);
         }
 
