@@ -41,7 +41,7 @@ impl Invaders {
             QUIT => self.lives = -1,
             KEY_LEFT => player.set_pos((previous.0, previous.1 - 1)),
             KEY_RIGHT => player.set_pos((previous.0, previous.1 + 1)),
-            ACTION => player.shoot(),
+            ACTION => self.gate.player_fire(),
             _ => (),
         };
         self.gate.enemy_fire();

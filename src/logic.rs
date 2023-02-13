@@ -1,3 +1,5 @@
+use std::time::{Duration, Instant};
+
 use ncurses::{getmaxx, getmaxy, WINDOW};
 use rand::distributions::{Distribution, Uniform};
 
@@ -16,6 +18,7 @@ pub struct Logic {
     height: i32,
     width: i32,
     dir: Direction,
+    last_attack: Instant,
 }
 
 impl Logic {
@@ -28,6 +31,7 @@ impl Logic {
             height: y,
             width: x,
             dir: Direction::Left,
+            last_attack: Instant::now(),
         }
     }
 
@@ -50,8 +54,16 @@ impl Logic {
         defeated_enemies
     }
 
+    pub fn player_fire(&mut self) {
+        const COOLDOWN: Duration = Duration::from_millis(400);
+        if self.last_attack.elapsed() >= COOLDOWN {
+            self.player.shoot();
+            self.last_attack = Instant::now();
+        }
+    }
+
     pub fn enemy_fire(&mut self) {
-        const DONT_FIRE_PROBABILY: f32 = 0.99;
+        const DONT_FIRE_PROBABILY: f32 = 0.95;
 
         let step = Uniform::new(0., 1.);
         let mut rng = rand::thread_rng();
