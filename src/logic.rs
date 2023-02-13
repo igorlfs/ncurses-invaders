@@ -115,10 +115,10 @@ impl Logic {
         let mut right_index = 0;
         let enemies = self.enemies();
         for i in 1..enemies.len() {
-            if enemies[left_index].pos().1 <= enemies[i].pos().1 {
-                right_index = i;
-            } else {
+            if enemies[i].pos().1 <= enemies[left_index].pos().1 {
                 left_index = i;
+            } else if enemies[i].pos().1 >= enemies[right_index].pos().1 {
+                right_index = i;
             }
         }
         (left_index, right_index)
