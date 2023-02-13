@@ -38,7 +38,7 @@ impl Invaders {
         const ACTION: i32 = ' ' as i32;
         let player = self.gate.player_mut();
         match self.input {
-            QUIT => self.lives = 0,
+            QUIT => self.lives = -1,
             KEY_LEFT => player.set_pos((previous.0, previous.1 - 1)),
             KEY_RIGHT => player.set_pos((previous.0, previous.1 + 1)),
             ACTION => player.shoot(),
