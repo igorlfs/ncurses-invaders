@@ -42,6 +42,14 @@ impl Logic {
         }
     }
 
+    pub fn level_up(&mut self) -> bool {
+        let defeated_enemies = self.enemies.is_empty();
+        if defeated_enemies {
+            self.create_enemies();
+        }
+        defeated_enemies
+    }
+
     pub fn enemy_fire(&mut self) {
         const DONT_FIRE_PROBABILY: f32 = 0.99;
 
