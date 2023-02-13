@@ -30,12 +30,13 @@ impl Logic {
             dir: Direction::Left,
         }
     }
-    const NUM_ENEMIES: i32 = 10;
-    const ROWS: i32 = 4;
 
     pub fn create_enemies(&mut self) {
-        for j in 0..Logic::ROWS {
-            for i in 0..Logic::NUM_ENEMIES {
+        const NUM_ENEMIES: i32 = 10;
+        const ROWS: i32 = 4;
+
+        for j in 0..ROWS {
+            for i in 0..NUM_ENEMIES {
                 self.enemies.push(Shooter::new((2 * (j + 1), 2 * i + 1)));
             }
         }
@@ -66,10 +67,13 @@ impl Logic {
         false
     }
 
-    pub fn hit_enemies(&mut self) {
+    pub fn hit_enemies(&mut self) -> usize {
+        let previous_size = self.enemies.len();
         for bullet in self.player.bullets().iter() {
             self.enemies.retain(|enemy| enemy.pos() != bullet.pos());
         }
+        let new_size = self.enemies().len();
+        previous_size - new_size
     }
 
     pub fn move_bullets(&mut self) {
@@ -88,7 +92,7 @@ impl Logic {
 
     pub fn move_enemies(&mut self) {
         // TODO: we should choose leftmost and rightmost element instead of hardcoding
-        let ceil = (Logic::NUM_ENEMIES - 1) as usize;
+        let ceil = 29;
 
         if self.dir == Direction::Left && self.enemies[ceil].pos().1 == self.width - 2
             || self.enemies[0].pos().1 == 1 && self.dir == Direction::Right

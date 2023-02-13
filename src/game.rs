@@ -50,7 +50,8 @@ impl Invaders {
         if self.gate.hit_player() {
             self.lives -= 1;
         }
-        self.gate.hit_enemies();
+        const MULTIPLIER: i32 = 20;
+        self.score += (self.gate.hit_enemies() as i32) * MULTIPLIER;
     }
 
     fn print(&self) {
