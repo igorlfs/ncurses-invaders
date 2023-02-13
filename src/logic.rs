@@ -90,17 +90,30 @@ impl Logic {
         }
     }
 
-    pub fn move_enemies(&mut self) {
-        // TODO: we should choose leftmost and rightmost element instead of hardcoding
-        let ceil = 29;
+    fn get_indexes(&self) -> (usize, usize) {
+        let mut left_index = 0;
+        let mut right_index = 0;
+        let enemies = self.enemies();
+        for i in 1..enemies.len() {
+            if enemies[left_index].pos().1 <= enemies[i].pos().1 {
+                right_index = i;
+            } else {
+                left_index = i;
+            }
+        }
+        (left_index, right_index)
+    }
 
-        if self.dir == Direction::Left && self.enemies[ceil].pos().1 == self.width - 2
-            || self.enemies[0].pos().1 == 1 && self.dir == Direction::Right
+    pub fn move_enemies(&mut self) {
+        let (left, right) = self.get_indexes();
+
+        if self.dir == Direction::Left && self.enemies[right].pos().1 == self.width - 2
+            || self.enemies[left].pos().1 == 1 && self.dir == Direction::Right
         {
             self.dir = Direction::Down;
-        } else if self.dir == Direction::Down && self.enemies[ceil].pos().1 == self.width - 2 {
+        } else if self.dir == Direction::Down && self.enemies[right].pos().1 == self.width - 2 {
             self.dir = Direction::Right;
-        } else if self.dir == Direction::Down && self.enemies[0].pos().1 == 1 {
+        } else if self.dir == Direction::Down && self.enemies[left].pos().1 == 1 {
             self.dir = Direction::Left;
         }
 
