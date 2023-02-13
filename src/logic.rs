@@ -78,7 +78,7 @@ impl Logic {
 
     pub fn move_bullets(&mut self) {
         for bullet in self.player.bullets_mut() {
-            bullet.shift(&bullet::Direction::Up, &2);
+            bullet.shift(&bullet::Direction::Up, &3);
         }
         self.player.clear_bullets();
 
