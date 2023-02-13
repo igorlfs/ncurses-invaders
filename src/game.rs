@@ -45,7 +45,9 @@ impl Invaders {
             _ => (),
         };
         self.gate.enemy_fire();
-        self.gate.move_enemies();
+        if self.gate.move_enemies() {
+            self.lives = -1;
+        };
         self.gate.move_bullets();
         if self.gate.hit_player() {
             self.lives -= 1;

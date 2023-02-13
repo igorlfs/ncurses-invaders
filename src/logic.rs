@@ -110,7 +110,7 @@ impl Logic {
         }
     }
 
-    fn get_indexes(&self) -> (usize, usize) {
+    fn get_horizontal_indexes(&self) -> (usize, usize) {
         let mut left_index = 0;
         let mut right_index = 0;
         let enemies = self.enemies();
@@ -124,8 +124,19 @@ impl Logic {
         (left_index, right_index)
     }
 
-    pub fn move_enemies(&mut self) {
-        let (left, right) = self.get_indexes();
+    fn get_bottom(&self) -> i32 {
+        let mut bottom = 0;
+        let enemies = self.enemies();
+        for i in 1..enemies.len() {
+            if enemies[bottom].pos().0 <= enemies[i].pos().0 {
+                bottom = i;
+            }
+        }
+        enemies[bottom].pos().0
+    }
+
+    pub fn move_enemies(&mut self) -> bool {
+        let (left, right) = self.get_horizontal_indexes();
 
         if self.dir == Direction::Left && self.enemies[right].pos().1 == self.width - 2
             || self.enemies[left].pos().1 == 1 && self.dir == Direction::Right
@@ -137,6 +148,11 @@ impl Logic {
             self.dir = Direction::Left;
         }
 
+        let bottom = self.get_bottom();
+        if bottom == self.height - 2 {
+            return true;
+        }
+
         for enemy in self.enemies.iter_mut() {
             let previous = enemy.pos();
             let new_pos = match self.dir {
@@ -146,6 +162,8 @@ impl Logic {
             };
             enemy.set_pos(new_pos);
         }
+
+        false
     }
 
     pub fn enemies(&self) -> &[Shooter] {
