@@ -29,11 +29,21 @@ fn colors() {
     }
 }
 
+fn get_centralized_window() -> WINDOW {
+    const LINES: i32 = 20;
+    const COLS: i32 = 40;
+
+    let x = getmaxx(stdscr());
+    let y = getmaxy(stdscr());
+
+    newwin(LINES, COLS, (y - LINES) / 2, (x - COLS) / 2)
+}
+
 fn main() {
     initialize();
     colors();
 
-    let game_window: WINDOW = newwin(20, 40, 0, 0);
+    let game_window: WINDOW = get_centralized_window();
     let mut invaders = game::Invaders::new(game_window);
     invaders.init();
 
