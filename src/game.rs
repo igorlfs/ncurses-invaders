@@ -1,6 +1,6 @@
-use ncurses::{box_, keypad, leaveok, wgetch, KEY_LEFT, KEY_RIGHT, WINDOW};
+use ncurses::{box_, delwin, keypad, leaveok, mvwaddstr, wgetch, KEY_LEFT, KEY_RIGHT, WINDOW};
 
-use crate::{logic::Logic, printer::Printer, shooter::Shooter};
+use crate::{logic::Logic, printer::Printer, shooter::Shooter, window};
 
 pub struct Invaders {
     lives: i8,
@@ -20,6 +20,7 @@ impl Invaders {
             gate: Logic::new(win),
         }
     }
+
     pub fn init(&mut self) {
         box_(self.window, 0, 0);
         leaveok(self.window, true);
@@ -72,6 +73,27 @@ impl Invaders {
         self.lives <= -1
     }
 
+    fn quit(&self) {
+        const LINES: i32 = 10;
+        const COLS: i32 = 20;
+
+        let quit_window = window::get_centralized_window(LINES, COLS);
+
+        box_(quit_window, 0, 0);
+        mvwaddstr(quit_window, 2, 5, "The Aliens");
+        mvwaddstr(quit_window, 3, 8, "Have");
+        mvwaddstr(quit_window, 4, 6, "INVADED!");
+        let score_str = format!("Score {}", self.score);
+        mvwaddstr(
+            quit_window,
+            7,
+            (COLS - score_str.len() as i32) / 2,
+            &score_str,
+        );
+        wgetch(quit_window);
+        delwin(quit_window);
+    }
+
     pub fn game_loop(&mut self) {
         loop {
             if self.is_over() {
@@ -81,5 +103,6 @@ impl Invaders {
             self.read_input();
             self.update();
         }
+        self.quit();
     }
 }

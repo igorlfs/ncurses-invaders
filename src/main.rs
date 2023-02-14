@@ -3,6 +3,7 @@ mod game;
 mod logic;
 mod printer;
 mod shooter;
+mod window;
 use ncurses::*;
 
 fn initialize() {
@@ -29,21 +30,14 @@ fn colors() {
     }
 }
 
-fn get_centralized_window() -> WINDOW {
-    const LINES: i32 = 20;
-    const COLS: i32 = 40;
-
-    let x = getmaxx(stdscr());
-    let y = getmaxy(stdscr());
-
-    newwin(LINES, COLS, (y - LINES) / 2, (x - COLS) / 2)
-}
-
 fn main() {
     initialize();
     colors();
 
-    let game_window: WINDOW = get_centralized_window();
+    const LINES: i32 = 20;
+    const COLS: i32 = 40;
+
+    let game_window: WINDOW = window::get_centralized_window(LINES, COLS);
     let mut invaders = game::Invaders::new(game_window);
     invaders.init();
 
