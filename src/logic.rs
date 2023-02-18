@@ -147,8 +147,14 @@ impl Logic {
 
     pub fn hit_enemies(&mut self) -> usize {
         let previous_size = self.enemies.len();
+        let enemies_copy = self.enemies.to_vec();
         for bullet in self.player.bullets().iter() {
             self.enemies.retain(|enemy| enemy.pos() != bullet.pos());
+        }
+        for enemy in enemies_copy.iter() {
+            self.player
+                .bullets_mut()
+                .retain(|bullet| bullet.pos() != enemy.pos());
         }
         let new_size = self.enemies.len();
         previous_size - new_size

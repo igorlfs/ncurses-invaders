@@ -2,6 +2,7 @@ use std::collections::VecDeque;
 
 use crate::bullet::Bullet;
 
+#[derive(Clone)]
 pub struct Shooter {
     pos: (i32, i32),
     bullets: VecDeque<Bullet>,
