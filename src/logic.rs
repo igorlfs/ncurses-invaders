@@ -64,7 +64,7 @@ impl Logic {
         const POWER_PROBABILITY: f32 = 0.05;
         if Self::random_event(POWER_PROBABILITY) {
             let mut rng = rand::thread_rng();
-            let y = rng.gen_range(1..self.height - 2);
+            let y = rng.gen_range(2..self.height - 2);
             let x = rng.gen_range(1..self.width - 1);
             self.powers.push(PowerUp::new((y, x), Effect::Double));
         }
