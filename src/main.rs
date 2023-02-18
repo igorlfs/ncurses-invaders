@@ -1,6 +1,7 @@
 mod bullet;
 mod game;
 mod logic;
+mod power;
 mod printer;
 mod shooter;
 mod window;

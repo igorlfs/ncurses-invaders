@@ -1,9 +1,19 @@
-use std::time::{Duration, Instant};
+use std::{
+    collections::HashMap,
+    time::{Duration, Instant},
+};
 
 use ncurses::{getmaxx, getmaxy, WINDOW};
-use rand::distributions::{Distribution, Uniform};
+use rand::{
+    distributions::{Distribution, Uniform},
+    Rng,
+};
 
-use crate::{bullet, shooter::Shooter};
+use crate::{
+    bullet,
+    power::{Effect, PowerUp},
+    shooter::Shooter,
+};
 
 #[derive(PartialEq)]
 enum Direction {
@@ -15,6 +25,8 @@ enum Direction {
 pub struct Logic {
     enemies: Vec<Shooter>,
     player: Shooter,
+    powers: Vec<PowerUp>,
+    effects: HashMap<Effect, Instant>,
     height: i32,
     width: i32,
     dir: Direction,
@@ -27,6 +39,8 @@ impl Logic {
         let x = getmaxx(win);
         Self {
             enemies: vec![],
+            powers: vec![],
+            effects: HashMap::new(),
             player: Shooter::new((y - 2, x / 2)),
             height: y,
             width: x,
@@ -46,6 +60,16 @@ impl Logic {
         }
     }
 
+    pub fn create_power(&mut self) {
+        const POWER_PROBABILITY: f32 = 0.05;
+        if Self::random_event(POWER_PROBABILITY) {
+            let mut rng = rand::thread_rng();
+            let y = rng.gen_range(1..self.height - 2);
+            let x = rng.gen_range(1..self.width - 1);
+            self.powers.push(PowerUp::new((y, x), Effect::Double));
+        }
+    }
+
     pub fn level_up(&mut self) -> bool {
         let defeated_enemies = self.enemies.is_empty();
         if defeated_enemies {
@@ -54,23 +78,44 @@ impl Logic {
         defeated_enemies
     }
 
+    fn handle_double(&mut self) {
+        let player_pos = self.player.pos();
+        let pos = (player_pos.0 - 1, player_pos.1);
+        self.player.shoot_pos(&pos);
+    }
+
+    fn handle_powers(&mut self) {
+        const COOLDOWN: Duration = Duration::from_secs(10);
+        for (power, time) in self.effects.clone().iter() {
+            if time.elapsed() <= COOLDOWN {
+                match power {
+                    Effect::Double => self.handle_double(),
+                }
+            }
+        }
+    }
+
     pub fn player_fire(&mut self) {
-        const COOLDOWN: Duration = Duration::from_millis(400);
+        const COOLDOWN: Duration = Duration::from_millis(500);
         if self.last_attack.elapsed() >= COOLDOWN {
             self.player.shoot();
+            self.handle_powers();
             self.last_attack = Instant::now();
         }
     }
 
-    pub fn enemy_fire(&mut self) {
-        const DONT_FIRE_PROBABILY: f32 = 0.95;
-
+    fn random_event(reference: f32) -> bool {
         let step = Uniform::new(0., 1.);
         let mut rng = rand::thread_rng();
+        let choice = step.sample(&mut rng);
+        choice <= reference
+    }
+
+    pub fn enemy_fire(&mut self) {
+        const FIRE_PROBABILY: f32 = 0.05;
 
         for enemy in self.enemies.iter_mut() {
-            let choice = step.sample(&mut rng);
-            if choice > DONT_FIRE_PROBABILY {
+            if Self::random_event(FIRE_PROBABILY) {
                 enemy.shoot();
             }
         }
@@ -87,12 +132,25 @@ impl Logic {
         false
     }
 
+    pub fn hit_powers(&mut self) {
+        for bullet in self.player.bullets().iter() {
+            self.powers.retain(|power| {
+                if power.pos() != bullet.pos() {
+                    true
+                } else {
+                    self.effects.insert(*power.effect(), Instant::now());
+                    false
+                }
+            });
+        }
+    }
+
     pub fn hit_enemies(&mut self) -> usize {
         let previous_size = self.enemies.len();
         for bullet in self.player.bullets().iter() {
             self.enemies.retain(|enemy| enemy.pos() != bullet.pos());
         }
-        let new_size = self.enemies().len();
+        let new_size = self.enemies.len();
         previous_size - new_size
     }
 
@@ -176,5 +234,9 @@ impl Logic {
 
     pub fn player_mut(&mut self) -> &mut Shooter {
         &mut self.player
+    }
+
+    pub fn powers(&self) -> &[PowerUp] {
+        self.powers.as_ref()
     }
 }

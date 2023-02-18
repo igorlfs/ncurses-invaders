@@ -45,11 +45,13 @@ impl Invaders {
             ACTION => self.gate.player_fire(),
             _ => (),
         };
+        self.gate.create_power();
         self.gate.enemy_fire();
         if self.gate.move_enemies() {
             self.lives = -1;
         };
         self.gate.move_bullets();
+        self.gate.hit_powers();
         if self.gate.hit_player() {
             self.lives -= 1;
         }
@@ -65,6 +67,8 @@ impl Invaders {
         Printer::header(self.score, self.window, self.lives);
         let enemies: &[Shooter] = self.gate.enemies();
         Printer::enemies(self.window, enemies);
+        let powers = self.gate.powers();
+        Printer::powers(self.window, powers);
         let player = self.gate.player();
         Printer::player(self.window, player);
     }

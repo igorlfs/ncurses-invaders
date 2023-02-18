@@ -48,4 +48,8 @@ impl Shooter {
         let pos = self.pos();
         self.bullets.push_back(Bullet::new(pos));
     }
+
+    pub fn shoot_pos(&mut self, pos: &(i32, i32)) {
+        self.bullets.push_back(Bullet::new(*pos));
+    }
 }

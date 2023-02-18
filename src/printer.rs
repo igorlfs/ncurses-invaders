@@ -1,6 +1,6 @@
 use ncurses::*;
 
-use crate::shooter::Shooter;
+use crate::{power::PowerUp, shooter::Shooter};
 
 pub struct Printer {}
 
@@ -23,6 +23,7 @@ impl Printer {
             }
         }
     }
+
     pub fn header(score: i32, win: WINDOW, lives: i8) {
         mvwprintw(win, 1, 1, &format!("SCORE: {score}"));
 
@@ -39,6 +40,16 @@ impl Printer {
 
         mvwprintw(win, 1, x, &live_str);
     }
+
+    pub fn powers(win: WINDOW, powers: &[PowerUp]) {
+        wattron(win, COLOR_PAIR(5));
+        for power in powers {
+            let pos = power.pos();
+            mvwaddch(win, pos.0, pos.1, '+' as u32);
+        }
+        wattroff(win, COLOR_PAIR(5));
+    }
+
     pub fn enemies(win: WINDOW, enemies: &[Shooter]) {
         let bundle = Bundle {
             char_shooter: 'v' as u32,
@@ -50,6 +61,7 @@ impl Printer {
             Printer::shooter_helper(win, enemy, &bundle);
         }
     }
+
     pub fn player(win: WINDOW, player: &Shooter) {
         let bundle = Bundle {
             char_shooter: '^' as u32,
