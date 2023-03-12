@@ -4,6 +4,7 @@ use crate::{logic::Logic, printer::Printer, shooter::Shooter, window};
 
 pub struct Invaders {
     lives: i8,
+    level: i32,
     input: i32,
     score: i32,
     gate: Logic,
@@ -14,6 +15,7 @@ impl Invaders {
     pub fn new(win: WINDOW) -> Self {
         Self {
             lives: 3,
+            level: 1,
             input: 0,
             score: 0,
             window: win,
@@ -56,9 +58,10 @@ impl Invaders {
             self.lives -= 1;
         }
         const MULTIPLIER: i32 = 20;
-        self.score += (self.gate.hit_enemies() as i32) * MULTIPLIER;
+        self.score += (self.gate.hit_enemies() as i32) * MULTIPLIER * self.level;
         if self.gate.level_up() && self.lives < 3 {
             self.lives += 1;
+            self.level += 1;
         }
     }
 
