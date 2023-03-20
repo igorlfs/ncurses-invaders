@@ -1,18 +1,17 @@
-use std::{
-    collections::HashMap,
-    time::{Duration, Instant},
+use crate::{
+    bullet,
+    power::{Effect, PowerUp},
+    shooter::Shooter,
+    util,
 };
-
 use ncurses::{getmaxx, getmaxy, WINDOW};
 use rand::{
     distributions::{Distribution, Uniform},
     Rng,
 };
-
-use crate::{
-    bullet,
-    power::{Effect, PowerUp},
-    shooter::Shooter,
+use std::{
+    collections::HashMap,
+    time::{Duration, Instant},
 };
 
 #[derive(PartialEq)]
@@ -66,22 +65,23 @@ impl Logic {
             let mut rng = rand::thread_rng();
             let y = rng.gen_range(2..self.height - 2);
             let x = rng.gen_range(1..self.width - 1);
-            self.powers.push(PowerUp::new((y, x), Effect::Double));
+            self.powers.push(PowerUp::new((y, x), rand::random()));
         }
-    }
-
-    pub fn level_up(&mut self) -> bool {
-        let defeated_enemies = self.enemies.is_empty();
-        if defeated_enemies {
-            self.create_enemies();
-        }
-        defeated_enemies
     }
 
     fn handle_double(&mut self) {
         let player_pos = self.player.pos();
         let pos = (player_pos.0 - 1, player_pos.1);
-        self.player.shoot_pos(&pos);
+        self.player.shoot_pos(&pos, bullet::Direction::Up);
+    }
+
+    fn handle_triple(&mut self) {
+        let player_pos = self.player.pos();
+        let pos_left = (player_pos.0 - 1, player_pos.1 + 1);
+        self.player.shoot_pos(&pos_left, bullet::Direction::LeftUp);
+        let pos_right = (player_pos.0 - 1, player_pos.1 - 1);
+        self.player
+            .shoot_pos(&pos_right, bullet::Direction::RightUp);
     }
 
     fn handle_powers(&mut self) {
@@ -90,6 +90,7 @@ impl Logic {
             if time.elapsed() <= COOLDOWN {
                 match power {
                     Effect::Double => self.handle_double(),
+                    Effect::Triple => self.handle_triple(),
                 }
             }
         }
@@ -98,7 +99,7 @@ impl Logic {
     pub fn player_fire(&mut self) {
         const COOLDOWN: Duration = Duration::from_millis(500);
         if self.last_attack.elapsed() >= COOLDOWN {
-            self.player.shoot();
+            self.player.shoot(bullet::Direction::Up);
             self.handle_powers();
             self.last_attack = Instant::now();
         }
@@ -116,7 +117,7 @@ impl Logic {
 
         for enemy in self.enemies.iter_mut() {
             if Self::random_event(FIRE_PROBABILY) {
-                enemy.shoot();
+                enemy.shoot(bullet::Direction::Down);
             }
         }
     }
@@ -160,15 +161,27 @@ impl Logic {
         previous_size - new_size
     }
 
+    pub fn move_player(&mut self, direction: i32) {
+        let pos = self.player.pos();
+        let new_pos = if direction == ncurses::KEY_LEFT {
+            (pos.0, pos.1 - 1)
+        } else {
+            (pos.0, pos.1 + 1)
+        };
+        if !util::out_of_bounds(new_pos) {
+            self.player.set_pos(new_pos)
+        }
+    }
+
     pub fn move_bullets(&mut self) {
         for bullet in self.player.bullets_mut() {
-            bullet.shift(&bullet::Direction::Up, &3);
+            bullet.shift();
         }
         self.player.clear_bullets();
 
         for enemy in self.enemies.iter_mut() {
             for bullet in enemy.bullets_mut() {
-                bullet.shift(&bullet::Direction::Down, &(self.height - 3));
+                bullet.shift();
             }
             enemy.clear_bullets();
         }
@@ -212,11 +225,6 @@ impl Logic {
             self.dir = Direction::Left;
         }
 
-        let bottom = self.get_bottom();
-        if bottom == self.height - 2 {
-            return true;
-        }
-
         for enemy in self.enemies.iter_mut() {
             let previous = enemy.pos();
             let new_pos = match self.dir {
@@ -227,7 +235,7 @@ impl Logic {
             enemy.set_pos(new_pos);
         }
 
-        false
+        self.get_bottom() == self.height - 2
     }
 
     pub fn enemies(&self) -> &[Shooter] {
@@ -236,10 +244,6 @@ impl Logic {
 
     pub fn player(&self) -> &Shooter {
         &self.player
-    }
-
-    pub fn player_mut(&mut self) -> &mut Shooter {
-        &mut self.player
     }
 
     pub fn powers(&self) -> &[PowerUp] {

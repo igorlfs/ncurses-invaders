@@ -4,6 +4,7 @@ mod logic;
 mod power;
 mod printer;
 mod shooter;
+mod util;
 mod window;
 use ncurses::*;
 
@@ -31,12 +32,12 @@ fn colors() {
     }
 }
 
+pub const LINES: i32 = 20;
+pub const COLS: i32 = 40;
+
 fn main() {
     initialize();
     colors();
-
-    const LINES: i32 = 20;
-    const COLS: i32 = 40;
 
     let game_window: WINDOW = window::get_centralized_window(LINES, COLS);
     let mut invaders = game::Invaders::new(game_window);

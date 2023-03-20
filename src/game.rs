@@ -2,8 +2,11 @@ use ncurses::{box_, delwin, keypad, leaveok, mvwaddstr, wgetch, KEY_LEFT, KEY_RI
 
 use crate::{logic::Logic, printer::Printer, shooter::Shooter, window};
 
+const MAX_SHIPS: i8 = 3;
+const MULTIPLIER: i32 = 20;
+
 pub struct Invaders {
-    lives: i8,
+    ships: i8,
     level: i32,
     input: i32,
     score: i32,
@@ -14,8 +17,8 @@ pub struct Invaders {
 impl Invaders {
     pub fn new(win: WINDOW) -> Self {
         Self {
-            lives: 3,
-            level: 1,
+            ships: MAX_SHIPS,
+            level: 0,
             input: 0,
             score: 0,
             window: win,
@@ -27,8 +30,6 @@ impl Invaders {
         box_(self.window, 0, 0);
         leaveok(self.window, true);
         keypad(self.window, true);
-
-        self.gate.create_enemies();
     }
 
     fn read_input(&mut self) {
@@ -36,38 +37,34 @@ impl Invaders {
     }
 
     fn update(&mut self) {
-        let previous = self.gate.player().pos();
-        const QUIT: i32 = 'q' as i32;
-        const ACTION: i32 = ' ' as i32;
-        let player = self.gate.player_mut();
-        match self.input {
-            QUIT => self.lives = -1,
-            KEY_LEFT => player.set_pos((previous.0, previous.1 - 1)),
-            KEY_RIGHT => player.set_pos((previous.0, previous.1 + 1)),
-            ACTION => self.gate.player_fire(),
-            _ => (),
-        };
+        if self.gate.enemies().is_empty() {
+            self.gate.create_enemies();
+            self.level += 1;
+            if self.ships < MAX_SHIPS {
+                self.ships += 1;
+            }
+        }
+        if self.input == ' ' as i32 {
+            self.gate.player_fire();
+        } else if self.input == KEY_RIGHT || self.input == KEY_LEFT {
+            self.gate.move_player(self.input);
+        }
         self.gate.create_power();
         self.gate.enemy_fire();
-        if self.gate.move_enemies() {
-            self.lives = -1;
+        if self.gate.move_enemies() || self.input == 'q' as i32 {
+            self.ships = -1;
         };
         self.gate.move_bullets();
         self.gate.hit_powers();
         if self.gate.hit_player() {
-            self.lives -= 1;
+            self.ships -= 1;
         }
-        const MULTIPLIER: i32 = 20;
         self.score += (self.gate.hit_enemies() as i32) * MULTIPLIER * self.level;
-        if self.gate.level_up() && self.lives < 3 {
-            self.lives += 1;
-            self.level += 1;
-        }
     }
 
     fn print(&self) {
         Printer::clear(self.window);
-        Printer::header(self.score, self.window, self.lives);
+        Printer::header(self.score, self.window, self.ships);
         let enemies: &[Shooter] = self.gate.enemies();
         Printer::enemies(self.window, enemies);
         let powers = self.gate.powers();
@@ -77,7 +74,7 @@ impl Invaders {
     }
 
     fn is_over(&self) -> bool {
-        self.lives <= -1
+        self.ships <= -1
     }
 
     fn quit(&self) {
@@ -106,9 +103,9 @@ impl Invaders {
             if self.is_over() {
                 break;
             }
+            self.update();
             self.print();
             self.read_input();
-            self.update();
         }
         self.quit();
     }
