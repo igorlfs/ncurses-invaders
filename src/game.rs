@@ -83,6 +83,7 @@ impl Invaders {
         if let Some(boss) = self.gate.boss() {
             Printer::boss(self.window, boss);
         }
+        Printer::footer(self.gate.active_effects());
     }
 
     fn is_over(&self) -> bool {

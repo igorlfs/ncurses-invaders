@@ -108,7 +108,7 @@ impl Logic {
             .shoot_pos(&pos_right, bullet::Direction::RightUp);
     }
 
-    fn handle_power(&mut self, effect: &Effect) -> bool {
+    fn handle_power(&self, effect: &Effect) -> bool {
         if let Some(time) = self.effects.get(effect) {
             if time.elapsed() < POWER_COOLDOWN {
                 return true;
@@ -337,5 +337,15 @@ impl Logic {
 
     pub fn boss(&self) -> Option<&Boss> {
         self.boss.as_ref()
+    }
+
+    pub fn active_effects(&self) -> Vec<Effect> {
+        let mut effects: Vec<Effect> = vec![];
+        for (effect, time) in &self.effects {
+            if time.elapsed() < POWER_COOLDOWN {
+                effects.push(*effect);
+            }
+        }
+        effects
     }
 }

@@ -23,9 +23,9 @@ impl Distribution<Effect> for Standard {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Effect {
         match rng.gen_range(0..=3) {
             0 => Effect::Double,
-            1 => Effect::Shield,
-            2 => Effect::Pierce,
-            _ => Effect::Triple,
+            1 => Effect::Triple,
+            2 => Effect::Shield,
+            _ => Effect::Pierce,
         }
     }
 }

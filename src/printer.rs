@@ -1,6 +1,12 @@
 use ncurses::*;
 
-use crate::{boss::Boss, power::PowerUp, shield::Shield, shooter::Shooter};
+use crate::{
+    boss::Boss,
+    power::{Effect, PowerUp},
+    shield::Shield,
+    shooter::Shooter,
+    window, COLS, LINES,
+};
 
 pub struct Printer {}
 
@@ -39,6 +45,20 @@ impl Printer {
         let x = max_x - (live_str.len() as i32) - 1;
 
         mvwprintw(win, 1, x, &live_str);
+    }
+
+    pub fn footer(effects: Vec<Effect>) {
+        let window = window::get_mid_window(3, COLS, LINES + 3);
+        box_(window, 0, 0);
+        let mut effects_string = String::new();
+        for effect in effects {
+            effects_string += &format!("{effect},");
+        }
+        if !effects_string.is_empty() {
+            effects_string.pop();
+        }
+        mvwprintw(window, 1, 1, &format!("PowerUps: {effects_string}"));
+        wrefresh(window);
     }
 
     pub fn powers(win: WINDOW, powers: &[PowerUp]) {
