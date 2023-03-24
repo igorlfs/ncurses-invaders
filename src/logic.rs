@@ -108,49 +108,24 @@ impl Logic {
             .shoot_pos(&pos_right, bullet::Direction::RightUp);
     }
 
-    fn handle_shield(&mut self) {
-        let effect = Effect::Shield;
-        match self.effects.get(&effect) {
-            Some(time) => {
-                if time.elapsed() >= POWER_COOLDOWN {
-                    self.effects.insert(effect, Instant::now());
-                    self.create_shield();
-                }
-            }
-            None => {
-                self.effects.insert(effect, Instant::now());
-                self.create_shield();
-            }
-        }
-    }
-
-    fn handle_pierce(&self) -> bool {
-        let effect = Effect::Pierce;
-        if let Some(time) = self.effects.get(&effect) {
-            if time.elapsed() < POWER_COOLDOWN {
-                return false;
-            }
-        }
-        true
-    }
-
-    fn handle_fire_powers(&mut self, effect: &Effect) {
+    fn handle_power(&mut self, effect: &Effect) -> bool {
         if let Some(time) = self.effects.get(effect) {
-            if time.elapsed() <= POWER_COOLDOWN {
-                match effect {
-                    Effect::Double => self.handle_double(),
-                    Effect::Triple => self.handle_triple(),
-                    _ => (),
-                }
+            if time.elapsed() < POWER_COOLDOWN {
+                return true;
             }
         }
+        false
     }
 
     pub fn player_fire(&mut self) {
         if self.last_attack.elapsed() >= ATTACK_COOLDOWN {
             self.player.shoot(bullet::Direction::Up);
-            self.handle_fire_powers(&Effect::Double);
-            self.handle_fire_powers(&Effect::Triple);
+            if self.handle_power(&Effect::Double) {
+                self.handle_double();
+            }
+            if self.handle_power(&Effect::Triple) {
+                self.handle_triple();
+            }
             self.last_attack = Instant::now();
         }
     }
@@ -190,15 +165,14 @@ impl Logic {
                 } else {
                     if *power.effect() == Effect::Shield {
                         shields = true;
-                    } else {
-                        self.effects.insert(*power.effect(), Instant::now());
                     }
+                    self.effects.insert(*power.effect(), Instant::now());
                     false
                 }
             });
         }
-        if shields {
-            self.handle_shield();
+        if self.handle_power(&Effect::Shield) && shields {
+            self.create_shield();
         }
     }
 
@@ -209,7 +183,7 @@ impl Logic {
             self.enemies.retain(|enemy| enemy.pos() != bullet.pos());
         }
 
-        if self.handle_pierce() {
+        if !self.handle_power(&Effect::Pierce) {
             for enemy in enemies_copy {
                 self.player
                     .bullets_mut()
