@@ -1,4 +1,5 @@
 use crate::{
+    boss::Boss,
     bullet,
     power::{Effect, PowerUp},
     shield::Shield,
@@ -27,7 +28,8 @@ const ENEMIES_PER_ROW: i32 = 10;
 const POWER_COOLDOWN: Duration = Duration::from_secs(10);
 const ATTACK_COOLDOWN: Duration = Duration::from_millis(500);
 const POWER_PROBABILITY: f32 = 0.08;
-const FIRE_PROBABILY: f32 = 0.05;
+const FIRE_PROBABILITY: f32 = 0.05;
+const BOSS_PROPABILITY: f32 = 0.001;
 const SHIELDS: i32 = 14;
 
 pub struct Logic {
@@ -36,6 +38,7 @@ pub struct Logic {
     powers: Vec<PowerUp>,
     shields: Vec<Shield>,
     effects: HashMap<Effect, Instant>,
+    boss: Option<Boss>,
     height: i32,
     width: i32,
     dir: Direction,
@@ -52,6 +55,7 @@ impl Logic {
             effects: HashMap::new(),
             shields: vec![],
             player: Shooter::new((y - 2, x / 2)),
+            boss: None,
             height: y,
             width: x,
             dir: Direction::Left,
@@ -71,6 +75,12 @@ impl Logic {
         for i in 1..SHIELDS {
             self.shields
                 .push(Shield::new((self.height - 3, 3 * i - 1), 3))
+        }
+    }
+
+    pub fn create_boss(&mut self) {
+        if Self::random_event(BOSS_PROPABILITY) && self.boss.is_none() {
+            self.boss = Some(Boss::new(0));
         }
     }
 
@@ -144,7 +154,7 @@ impl Logic {
 
     pub fn enemy_fire(&mut self) {
         for enemy in self.enemies.iter_mut() {
-            if Self::random_event(FIRE_PROBABILY) {
+            if Self::random_event(FIRE_PROBABILITY) {
                 enemy.shoot(bullet::Direction::Down);
             }
         }
@@ -197,6 +207,19 @@ impl Logic {
         previous_size - new_size
     }
 
+    pub fn hit_boss(&mut self) -> bool {
+        if let Some(boss) = self.boss {
+            for bullet in self.player.bullets() {
+                if bullet.pos() == (2, boss.left_pos()) || bullet.pos() == (2, boss.left_pos() + 1)
+                {
+                    self.boss = None;
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
     pub fn hit_shields(&mut self) {
         if let Some(time) = self.effects.get(&Effect::Shield) {
             if time.elapsed() > POWER_COOLDOWN {
@@ -219,6 +242,15 @@ impl Logic {
                     }
                 }
                 self.shields.retain(|shield| shield.lives() > 0);
+            }
+        }
+    }
+
+    pub fn move_boss(&mut self) {
+        if let Some(boss) = self.boss.as_mut() {
+            boss.shift();
+            if boss.left_pos() == self.width - 2 {
+                self.boss = None;
             }
         }
     }
@@ -314,5 +346,9 @@ impl Logic {
 
     pub fn shields(&self) -> &[Shield] {
         self.shields.as_ref()
+    }
+
+    pub fn boss(&self) -> Option<&Boss> {
+        self.boss.as_ref()
     }
 }

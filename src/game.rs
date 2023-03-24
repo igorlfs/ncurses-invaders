@@ -4,6 +4,7 @@ use crate::{logic::Logic, printer::Printer, window};
 
 const MAX_SHIPS: i8 = 3;
 const MULTIPLIER: i32 = 20;
+const BOSS_MULTIPLIER: i32 = 4000;
 
 pub struct Invaders {
     ships: i8,
@@ -50,13 +51,18 @@ impl Invaders {
             self.gate.move_player(self.input);
         }
         self.gate.create_power();
+        self.gate.create_boss();
         self.gate.enemy_fire();
         if self.gate.move_enemies() || self.input == 'q' as i32 {
             self.ships = -1;
         };
         self.gate.move_bullets();
+        self.gate.move_boss();
         self.gate.hit_powers();
         self.gate.hit_shields();
+        if self.gate.hit_boss() {
+            self.score += BOSS_MULTIPLIER * self.level;
+        }
         if self.gate.hit_player() {
             self.ships -= 1;
         }
@@ -74,6 +80,9 @@ impl Invaders {
         Printer::player(self.window, player);
         let shields = self.gate.shields();
         Printer::shields(self.window, shields);
+        if let Some(boss) = self.gate.boss() {
+            Printer::boss(self.window, boss);
+        }
     }
 
     fn is_over(&self) -> bool {

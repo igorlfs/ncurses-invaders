@@ -1,3 +1,4 @@
+mod boss;
 mod bullet;
 mod game;
 mod logic;
@@ -27,7 +28,7 @@ fn finalize() {
 
 fn colors() {
     const TOTAL_COLORS: i16 = 8;
-    init_pair(TOTAL_COLORS, 0, 0);
+    init_pair(TOTAL_COLORS, 0, -1);
     for i in 1..TOTAL_COLORS {
         init_pair(i, i, -1);
     }

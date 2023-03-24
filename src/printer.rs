@@ -1,6 +1,6 @@
 use ncurses::*;
 
-use crate::{power::PowerUp, shield::Shield, shooter::Shooter};
+use crate::{boss::Boss, power::PowerUp, shield::Shield, shooter::Shooter};
 
 pub struct Printer {}
 
@@ -48,6 +48,13 @@ impl Printer {
             mvwaddch(win, pos.0, pos.1, power.char());
         }
         wattroff(win, COLOR_PAIR(5));
+    }
+
+    pub fn boss(win: WINDOW, boss: &Boss) {
+        wattron(win, COLOR_PAIR(8));
+        mvwaddch(win, 2, boss.left_pos(), '\\' as u32);
+        mvwaddch(win, 2, boss.left_pos() + 1, '/' as u32);
+        wattroff(win, COLOR_PAIR(8));
     }
 
     pub fn shields(win: WINDOW, shields: &[Shield]) {
