@@ -10,6 +10,7 @@ pub enum Effect {
     Double,
     Triple,
     Shield,
+    Pierce,
 }
 
 impl fmt::Display for Effect {
@@ -20,9 +21,10 @@ impl fmt::Display for Effect {
 
 impl Distribution<Effect> for Standard {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Effect {
-        match rng.gen_range(0..=2) {
+        match rng.gen_range(0..=3) {
             0 => Effect::Double,
             1 => Effect::Shield,
+            2 => Effect::Pierce,
             _ => Effect::Triple,
         }
     }

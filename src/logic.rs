@@ -124,6 +124,16 @@ impl Logic {
         }
     }
 
+    fn handle_pierce(&self) -> bool {
+        let effect = Effect::Pierce;
+        if let Some(time) = self.effects.get(&effect) {
+            if time.elapsed() < POWER_COOLDOWN {
+                return false;
+            }
+        }
+        true
+    }
+
     fn handle_fire_powers(&mut self, effect: &Effect) {
         if let Some(time) = self.effects.get(effect) {
             if time.elapsed() <= POWER_COOLDOWN {
@@ -198,10 +208,13 @@ impl Logic {
         for bullet in self.player.bullets().iter() {
             self.enemies.retain(|enemy| enemy.pos() != bullet.pos());
         }
-        for enemy in enemies_copy.iter() {
-            self.player
-                .bullets_mut()
-                .retain(|bullet| bullet.pos() != enemy.pos());
+
+        if self.handle_pierce() {
+            for enemy in enemies_copy {
+                self.player
+                    .bullets_mut()
+                    .retain(|bullet| bullet.pos() != enemy.pos());
+            }
         }
         let new_size = self.enemies.len();
         previous_size - new_size
