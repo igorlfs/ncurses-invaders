@@ -1,6 +1,6 @@
 use ncurses::*;
 
-use crate::{power::PowerUp, shooter::Shooter};
+use crate::{power::PowerUp, shield::Shield, shooter::Shooter};
 
 pub struct Printer {}
 
@@ -45,9 +45,18 @@ impl Printer {
         wattron(win, COLOR_PAIR(5));
         for power in powers {
             let pos = power.pos();
-            mvwaddch(win, pos.0, pos.1, '+' as u32);
+            mvwaddch(win, pos.0, pos.1, power.char());
         }
         wattroff(win, COLOR_PAIR(5));
+    }
+
+    pub fn shields(win: WINDOW, shields: &[Shield]) {
+        wattron(win, COLOR_PAIR(6));
+        for shield in shields {
+            let pos = shield.pos();
+            mvwaddch(win, pos.0, pos.1, '_' as u32);
+        }
+        wattroff(win, COLOR_PAIR(6));
     }
 
     pub fn enemies(win: WINDOW, enemies: &[Shooter]) {

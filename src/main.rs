@@ -3,6 +3,7 @@ mod game;
 mod logic;
 mod power;
 mod printer;
+mod shield;
 mod shooter;
 mod util;
 mod window;

@@ -1,6 +1,6 @@
 use ncurses::{box_, delwin, keypad, leaveok, mvwaddstr, wgetch, KEY_LEFT, KEY_RIGHT, WINDOW};
 
-use crate::{logic::Logic, printer::Printer, shooter::Shooter, window};
+use crate::{logic::Logic, printer::Printer, window};
 
 const MAX_SHIPS: i8 = 3;
 const MULTIPLIER: i32 = 20;
@@ -56,6 +56,7 @@ impl Invaders {
         };
         self.gate.move_bullets();
         self.gate.hit_powers();
+        self.gate.hit_shields();
         if self.gate.hit_player() {
             self.ships -= 1;
         }
@@ -65,12 +66,14 @@ impl Invaders {
     fn print(&self) {
         Printer::clear(self.window);
         Printer::header(self.score, self.window, self.ships);
-        let enemies: &[Shooter] = self.gate.enemies();
+        let enemies = self.gate.enemies();
         Printer::enemies(self.window, enemies);
         let powers = self.gate.powers();
         Printer::powers(self.window, powers);
         let player = self.gate.player();
         Printer::player(self.window, player);
+        let shields = self.gate.shields();
+        Printer::shields(self.window, shields);
     }
 
     fn is_over(&self) -> bool {

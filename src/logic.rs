@@ -1,6 +1,7 @@
 use crate::{
     bullet,
     power::{Effect, PowerUp},
+    shield::Shield,
     shooter::Shooter,
     util,
 };
@@ -21,10 +22,19 @@ enum Direction {
     Down,
 }
 
+const ENEMY_ROWS: i32 = 4;
+const ENEMIES_PER_ROW: i32 = 10;
+const POWER_COOLDOWN: Duration = Duration::from_secs(10);
+const ATTACK_COOLDOWN: Duration = Duration::from_millis(500);
+const POWER_PROBABILITY: f32 = 0.08;
+const FIRE_PROBABILY: f32 = 0.05;
+const SHIELDS: i32 = 14;
+
 pub struct Logic {
     enemies: Vec<Shooter>,
     player: Shooter,
     powers: Vec<PowerUp>,
+    shields: Vec<Shield>,
     effects: HashMap<Effect, Instant>,
     height: i32,
     width: i32,
@@ -40,6 +50,7 @@ impl Logic {
             enemies: vec![],
             powers: vec![],
             effects: HashMap::new(),
+            shields: vec![],
             player: Shooter::new((y - 2, x / 2)),
             height: y,
             width: x,
@@ -49,18 +60,21 @@ impl Logic {
     }
 
     pub fn create_enemies(&mut self) {
-        const NUM_ENEMIES: i32 = 10;
-        const ROWS: i32 = 4;
-
-        for j in 0..ROWS {
-            for i in 0..NUM_ENEMIES {
+        for j in 0..ENEMY_ROWS {
+            for i in 0..ENEMIES_PER_ROW {
                 self.enemies.push(Shooter::new((2 * (j + 1), 2 * i + 1)));
             }
         }
     }
 
+    pub fn create_shield(&mut self) {
+        for i in 1..SHIELDS {
+            self.shields
+                .push(Shield::new((self.height - 3, 3 * i - 1), 3))
+        }
+    }
+
     pub fn create_power(&mut self) {
-        const POWER_PROBABILITY: f32 = 0.05;
         if Self::random_event(POWER_PROBABILITY) {
             let mut rng = rand::thread_rng();
             let y = rng.gen_range(2..self.height - 2);
@@ -84,23 +98,39 @@ impl Logic {
             .shoot_pos(&pos_right, bullet::Direction::RightUp);
     }
 
-    fn handle_powers(&mut self) {
-        const COOLDOWN: Duration = Duration::from_secs(10);
-        for (power, time) in self.effects.clone().iter() {
-            if time.elapsed() <= COOLDOWN {
-                match power {
+    fn handle_shield(&mut self) {
+        let effect = Effect::Shield;
+        match self.effects.get(&effect) {
+            Some(time) => {
+                if time.elapsed() >= POWER_COOLDOWN {
+                    self.effects.insert(effect, Instant::now());
+                    self.create_shield();
+                }
+            }
+            None => {
+                self.effects.insert(effect, Instant::now());
+                self.create_shield();
+            }
+        }
+    }
+
+    fn handle_fire_powers(&mut self, effect: &Effect) {
+        if let Some(time) = self.effects.get(effect) {
+            if time.elapsed() <= POWER_COOLDOWN {
+                match effect {
                     Effect::Double => self.handle_double(),
                     Effect::Triple => self.handle_triple(),
+                    _ => (),
                 }
             }
         }
     }
 
     pub fn player_fire(&mut self) {
-        const COOLDOWN: Duration = Duration::from_millis(500);
-        if self.last_attack.elapsed() >= COOLDOWN {
+        if self.last_attack.elapsed() >= ATTACK_COOLDOWN {
             self.player.shoot(bullet::Direction::Up);
-            self.handle_powers();
+            self.handle_fire_powers(&Effect::Double);
+            self.handle_fire_powers(&Effect::Triple);
             self.last_attack = Instant::now();
         }
     }
@@ -113,8 +143,6 @@ impl Logic {
     }
 
     pub fn enemy_fire(&mut self) {
-        const FIRE_PROBABILY: f32 = 0.05;
-
         for enemy in self.enemies.iter_mut() {
             if Self::random_event(FIRE_PROBABILY) {
                 enemy.shoot(bullet::Direction::Down);
@@ -134,15 +162,23 @@ impl Logic {
     }
 
     pub fn hit_powers(&mut self) {
-        for bullet in self.player.bullets().iter() {
+        let mut shields = false;
+        for bullet in self.player.bullets() {
             self.powers.retain(|power| {
                 if power.pos() != bullet.pos() {
                     true
                 } else {
-                    self.effects.insert(*power.effect(), Instant::now());
+                    if *power.effect() == Effect::Shield {
+                        shields = true;
+                    } else {
+                        self.effects.insert(*power.effect(), Instant::now());
+                    }
                     false
                 }
             });
+        }
+        if shields {
+            self.handle_shield();
         }
     }
 
@@ -159,6 +195,32 @@ impl Logic {
         }
         let new_size = self.enemies.len();
         previous_size - new_size
+    }
+
+    pub fn hit_shields(&mut self) {
+        if let Some(time) = self.effects.get(&Effect::Shield) {
+            if time.elapsed() > POWER_COOLDOWN {
+                self.shields.clear();
+            } else {
+                for enemy in &self.enemies {
+                    for bullet in enemy.bullets() {
+                        for shield in self.shields.iter_mut() {
+                            if bullet.pos() == shield.pos() {
+                                shield.damage();
+                            }
+                        }
+                    }
+                }
+                for shield in &self.shields {
+                    for enemy in self.enemies.iter_mut() {
+                        enemy
+                            .bullets_mut()
+                            .retain(|bullet| bullet.pos() != shield.pos());
+                    }
+                }
+                self.shields.retain(|shield| shield.lives() > 0);
+            }
+        }
     }
 
     pub fn move_player(&mut self, direction: i32) {
@@ -248,5 +310,9 @@ impl Logic {
 
     pub fn powers(&self) -> &[PowerUp] {
         self.powers.as_ref()
+    }
+
+    pub fn shields(&self) -> &[Shield] {
+        self.shields.as_ref()
     }
 }
