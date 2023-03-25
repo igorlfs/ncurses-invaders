@@ -158,21 +158,31 @@ impl Logic {
 
     pub fn hit_powers(&mut self) {
         let mut shields = false;
+        let mut clear = false;
         for bullet in self.player.bullets() {
             self.powers.retain(|power| {
                 if power.pos() != bullet.pos() {
                     true
                 } else {
-                    if *power.effect() == Effect::Shield {
-                        shields = true;
+                    if *power.effect() == Effect::Clear {
+                        clear = true;
+                    } else {
+                        if *power.effect() == Effect::Shield {
+                            shields = true;
+                        }
+                        self.effects.insert(*power.effect(), Instant::now());
                     }
-                    self.effects.insert(*power.effect(), Instant::now());
                     false
                 }
             });
         }
         if self.handle_power(&Effect::Shield) && shields {
             self.create_shield();
+        }
+        if clear {
+            for enemy in self.enemies.iter_mut() {
+                enemy.bullets_mut().clear();
+            }
         }
     }
 

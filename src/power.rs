@@ -7,6 +7,7 @@ use rand::{
 
 #[derive(Clone, Copy, Eq, Hash, PartialEq, Debug)]
 pub enum Effect {
+    Clear,
     Double,
     Triple,
     Shield,
@@ -21,11 +22,12 @@ impl fmt::Display for Effect {
 
 impl Distribution<Effect> for Standard {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Effect {
-        match rng.gen_range(0..=3) {
+        match rng.gen_range(0..=4) {
             0 => Effect::Double,
             1 => Effect::Triple,
             2 => Effect::Shield,
-            _ => Effect::Pierce,
+            3 => Effect::Pierce,
+            _ => Effect::Clear,
         }
     }
 }
