@@ -304,26 +304,28 @@ impl Logic {
     }
 
     pub fn move_enemies(&mut self) -> bool {
-        let (left, right) = self.get_horizontal_indexes();
+        if !self.handle_power(&Effect::Inactivate) {
+            let (left, right) = self.get_horizontal_indexes();
 
-        if self.dir == Direction::Left && self.enemies[right].pos().1 == self.width - 2
-            || self.enemies[left].pos().1 == 1 && self.dir == Direction::Right
-        {
-            self.dir = Direction::Down;
-        } else if self.dir == Direction::Down && self.enemies[right].pos().1 == self.width - 2 {
-            self.dir = Direction::Right;
-        } else if self.dir == Direction::Down && self.enemies[left].pos().1 == 1 {
-            self.dir = Direction::Left;
-        }
+            if self.dir == Direction::Left && self.enemies[right].pos().1 == self.width - 2
+                || self.enemies[left].pos().1 == 1 && self.dir == Direction::Right
+            {
+                self.dir = Direction::Down;
+            } else if self.dir == Direction::Down && self.enemies[right].pos().1 == self.width - 2 {
+                self.dir = Direction::Right;
+            } else if self.dir == Direction::Down && self.enemies[left].pos().1 == 1 {
+                self.dir = Direction::Left;
+            }
 
-        for enemy in self.enemies.iter_mut() {
-            let previous = enemy.pos();
-            let new_pos = match self.dir {
-                Direction::Left => (previous.0, previous.1 + 1),
-                Direction::Right => (previous.0, previous.1 - 1),
-                Direction::Down => (previous.0 + 1, previous.1),
-            };
-            enemy.set_pos(new_pos);
+            for enemy in self.enemies.iter_mut() {
+                let previous = enemy.pos();
+                let new_pos = match self.dir {
+                    Direction::Left => (previous.0, previous.1 + 1),
+                    Direction::Right => (previous.0, previous.1 - 1),
+                    Direction::Down => (previous.0 + 1, previous.1),
+                };
+                enemy.set_pos(new_pos);
+            }
         }
 
         self.get_bottom() == self.height - 2
