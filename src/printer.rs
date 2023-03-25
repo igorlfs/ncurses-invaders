@@ -48,6 +48,7 @@ impl Printer {
     }
 
     pub fn footer(effects: Vec<Effect>) {
+        const MAX_STR_SIZE: i32 = COLS - 15;
         let window = window::get_mid_window(3, COLS, LINES + 3);
         box_(window, 0, 0);
         let mut effects_string = String::new();
@@ -56,6 +57,10 @@ impl Printer {
         }
         if !effects_string.is_empty() {
             effects_string.pop();
+        }
+        if effects_string.len() as i32 >= MAX_STR_SIZE {
+            effects_string = effects_string.split_at(MAX_STR_SIZE as usize).0.to_string();
+            effects_string += "...";
         }
         mvwprintw(window, 1, 1, &format!("PowerUps: {effects_string}"));
         wrefresh(window);
