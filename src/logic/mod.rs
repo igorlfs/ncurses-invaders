@@ -23,7 +23,7 @@ const ENEMY_SCORE: i32 = 20;
 const ENEMY_ROWS: i32 = 4;
 const ENEMIES_PER_ROW: i32 = 10;
 const POWER_COOLDOWN: Duration = Duration::from_secs(10);
-const ATTACK_COOLDOWN: Duration = Duration::from_millis(500);
+const ATTACK_COOLDOWN: Duration = Duration::from_millis(600);
 const POWER_PROBABILITY: f32 = 0.08;
 const FIRE_PROBABILITY: f32 = 0.05;
 const BOSS_PROPABILITY: f32 = 0.001;
@@ -66,7 +66,12 @@ impl Logic {
     }
 
     pub fn player_shoot(&mut self) {
-        if self.last_attack.elapsed() >= ATTACK_COOLDOWN {
+        let cooldown = if Handle::power(self, &Effect::QuickShot) {
+            ATTACK_COOLDOWN / 2
+        } else {
+            ATTACK_COOLDOWN
+        };
+        if self.last_attack.elapsed() >= cooldown {
             self.player.shoot(Direction::Up);
             if Handle::power(self, &Effect::Double) {
                 Handle::double(self);
