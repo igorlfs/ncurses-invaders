@@ -66,6 +66,27 @@ impl Printer {
         wrefresh(window);
     }
 
+    pub fn quit(score: i32) {
+        const LINES: i32 = 10;
+        const COLS: i32 = 20;
+
+        let quit_window = window::get_centralized_window(LINES, COLS);
+
+        box_(quit_window, 0, 0);
+        mvwaddstr(quit_window, 2, 5, "The Aliens");
+        mvwaddstr(quit_window, 3, 8, "Have");
+        mvwaddstr(quit_window, 4, 6, "INVADED!");
+        let score_str = format!("Score {}", score);
+        mvwaddstr(
+            quit_window,
+            7,
+            (COLS - score_str.len() as i32) / 2,
+            &score_str,
+        );
+        wgetch(quit_window);
+        delwin(quit_window);
+    }
+
     pub fn powers(win: WINDOW, powers: &[PowerUp]) {
         wattron(win, COLOR_PAIR(5));
         for power in powers {

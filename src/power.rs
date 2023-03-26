@@ -1,9 +1,8 @@
-use std::fmt;
-
 use rand::{
     distributions::{Distribution, Standard},
     Rng,
 };
+use std::fmt;
 
 #[derive(Clone, Copy, Eq, Hash, PartialEq, Debug)]
 pub enum Effect {

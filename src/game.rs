@@ -1,10 +1,9 @@
-use ncurses::{box_, delwin, keypad, leaveok, mvwaddstr, wgetch, KEY_LEFT, KEY_RIGHT, WINDOW};
-
-use crate::{logic::Logic, printer::Printer, window};
+use crate::{direction::Direction, logic::Logic, printer::Printer};
+use ncurses::{box_, keypad, leaveok, wgetch, KEY_LEFT, KEY_RIGHT, WINDOW};
+use std::time::{Duration, Instant};
 
 const MAX_SHIPS: i8 = 3;
-const MULTIPLIER: i32 = 20;
-const BOSS_MULTIPLIER: i32 = 4000;
+const UPDATE_COOLDOWN: Duration = Duration::from_millis(50);
 
 pub struct Invaders {
     ships: i8,
@@ -12,6 +11,7 @@ pub struct Invaders {
     input: i32,
     score: i32,
     gate: Logic,
+    last_update: Instant,
     window: WINDOW,
 }
 
@@ -22,6 +22,7 @@ impl Invaders {
             level: 0,
             input: 0,
             score: 0,
+            last_update: Instant::now(),
             window: win,
             gate: Logic::new(win),
         }
@@ -39,34 +40,32 @@ impl Invaders {
 
     fn update(&mut self) {
         if self.gate.enemies().is_empty() {
-            self.gate.create_enemies();
-            self.level += 1;
+            self.gate.level_up(&mut self.level);
             if self.ships < MAX_SHIPS {
                 self.ships += 1;
             }
         }
+
         if self.input == ' ' as i32 {
-            self.gate.player_fire();
-        } else if self.input == KEY_RIGHT || self.input == KEY_LEFT {
-            self.gate.move_player(self.input);
-        }
-        self.gate.create_power();
-        self.gate.create_boss();
-        self.gate.enemy_fire();
-        if self.gate.move_enemies() || self.input == 'q' as i32 {
+            self.gate.player_shoot();
+        } else if self.input == KEY_RIGHT {
+            self.gate.player_move(&Direction::Right);
+        } else if self.input == KEY_LEFT {
+            self.gate.player_move(&Direction::Left);
+        } else if self.input == 'q' as i32 {
             self.ships = -1;
-        };
-        self.gate.move_bullets();
-        self.gate.move_boss();
-        self.gate.hit_powers();
-        self.gate.hit_shields();
-        if self.gate.hit_boss() {
-            self.score += BOSS_MULTIPLIER * self.level;
         }
-        if self.gate.hit_player() {
-            self.ships -= 1;
+
+        if self.last_update.elapsed() >= UPDATE_COOLDOWN {
+            self.gate.generate();
+            if self.gate.shift() {
+                self.ships = -1;
+            }
+            if self.gate.hit(&mut self.score, &self.level) {
+                self.ships -= 1;
+            }
+            self.last_update = Instant::now();
         }
-        self.score += (self.gate.hit_enemies() as i32) * MULTIPLIER * self.level;
     }
 
     fn print(&self) {
@@ -91,24 +90,7 @@ impl Invaders {
     }
 
     fn quit(&self) {
-        const LINES: i32 = 10;
-        const COLS: i32 = 20;
-
-        let quit_window = window::get_centralized_window(LINES, COLS);
-
-        box_(quit_window, 0, 0);
-        mvwaddstr(quit_window, 2, 5, "The Aliens");
-        mvwaddstr(quit_window, 3, 8, "Have");
-        mvwaddstr(quit_window, 4, 6, "INVADED!");
-        let score_str = format!("Score {}", self.score);
-        mvwaddstr(
-            quit_window,
-            7,
-            (COLS - score_str.len() as i32) / 2,
-            &score_str,
-        );
-        wgetch(quit_window);
-        delwin(quit_window);
+        Printer::quit(self.score);
     }
 
     pub fn game_loop(&mut self) {

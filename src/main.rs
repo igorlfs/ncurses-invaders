@@ -1,5 +1,6 @@
 mod boss;
 mod bullet;
+mod direction;
 mod game;
 mod logic;
 mod power;

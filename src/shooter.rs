@@ -1,9 +1,6 @@
 use std::collections::VecDeque;
 
-use crate::{
-    bullet::{Bullet, Direction},
-    util,
-};
+use crate::{bullet::Bullet, direction::Direction, util};
 
 #[derive(Clone)]
 pub struct Shooter {
@@ -23,8 +20,11 @@ impl Shooter {
         self.pos
     }
 
-    pub fn set_pos(&mut self, pos: (i32, i32)) {
-        self.pos = pos;
+    pub fn shift(&mut self, dir: &Direction) {
+        let new_pos = util::shift(&self.pos, dir);
+        if !util::out_of_bounds(new_pos) {
+            self.pos = new_pos;
+        }
     }
 
     pub fn bullets_mut(&mut self) -> &mut VecDeque<Bullet> {
