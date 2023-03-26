@@ -1,13 +1,16 @@
-use rand::Rng;
-
-use crate::{
-    boss::Boss, direction::Direction, power::PowerUp, shield::Shield, shooter::Shooter, util,
-};
-
 use super::{
-    Logic, BOSS_PROPABILITY, ENEMIES_PER_ROW, ENEMY_ROWS, FIRE_PROBABILITY, POWER_PROBABILITY,
-    SHIELDS,
+    handle::Handle, Logic, BOSS_PROPABILITY, ENEMIES_PER_ROW, ENEMY_ROWS, FIRE_PROBABILITY,
+    POWER_PROBABILITY, SHIELDS,
 };
+use crate::{
+    boss::Boss,
+    direction::Direction,
+    power::{Effect, PowerUp},
+    shield::Shield,
+    shooter::Shooter,
+    util,
+};
+use rand::Rng;
 
 pub struct Generate;
 
@@ -44,9 +47,11 @@ impl Generate {
     }
 
     pub fn enemy_attack(logic: &mut Logic) {
-        for enemy in logic.enemies.iter_mut() {
-            if util::random_event(FIRE_PROBABILITY) {
-                enemy.shoot(Direction::Down);
+        if !Handle::power(logic, &Effect::Hijack) {
+            for enemy in logic.enemies.iter_mut() {
+                if util::random_event(FIRE_PROBABILITY) {
+                    enemy.shoot(Direction::Down);
+                }
             }
         }
     }

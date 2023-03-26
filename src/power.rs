@@ -7,6 +7,7 @@ use std::fmt;
 #[derive(Clone, Copy, Eq, Hash, PartialEq, Debug)]
 pub enum Effect {
     Clear,
+    Hijack,
     Inactivate,
     Double,
     Triple,
@@ -22,13 +23,14 @@ impl fmt::Display for Effect {
 
 impl Distribution<Effect> for Standard {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Effect {
-        match rng.gen_range(0..=5) {
+        match rng.gen_range(0..=6) {
             0 => Effect::Double,
             1 => Effect::Triple,
             2 => Effect::Shield,
             3 => Effect::Pierce,
             4 => Effect::Clear,
-            _ => Effect::Inactivate,
+            5 => Effect::Inactivate,
+            _ => Effect::Hijack,
         }
     }
 }
