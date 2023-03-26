@@ -143,8 +143,10 @@ impl Logic {
                 self.dir = Direction::Right;
             }
 
-            for enemy in self.enemies.iter_mut() {
-                enemy.shift(&self.dir);
+            if !(self.dir == Direction::Down) || !Handle::power(self, &Effect::Antigravity) {
+                for enemy in self.enemies.iter_mut() {
+                    enemy.shift(&self.dir);
+                }
             }
         }
 
