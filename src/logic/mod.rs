@@ -20,10 +20,13 @@ use std::{
 
 const BOSS_SCORE: i32 = 4000;
 const ENEMY_SCORE: i32 = 20;
-const ENEMY_ROWS: i32 = 4;
+const ENEMY_ROWS: i32 = 5;
 const ENEMIES_PER_ROW: i32 = 10;
 const POWER_COOLDOWN: Duration = Duration::from_secs(10);
 const ATTACK_COOLDOWN: Duration = Duration::from_millis(600);
+const DOUBLE_ATTACK_COOLDOWN: Duration = Duration::from_millis(1000);
+const TRIPLE_ATTACK_COOLDOWN: Duration = Duration::from_millis(1600);
+const COMBINED_ATTACK_COOLDOWN: Duration = Duration::from_millis(2000);
 const POWER_PROBABILITY: f32 = 0.08;
 const FIRE_PROBABILITY: f32 = 0.05;
 const BOSS_PROPABILITY: f32 = 0.001;
@@ -40,6 +43,7 @@ pub struct Logic {
     width: i32,
     dir: Direction,
     last_attack: Instant,
+    cooldown_attack: Duration,
 }
 
 impl Logic {
@@ -57,6 +61,7 @@ impl Logic {
             width: x,
             dir: Direction::Right,
             last_attack: Instant::now(),
+            cooldown_attack: ATTACK_COOLDOWN,
         }
     }
 
@@ -66,18 +71,23 @@ impl Logic {
     }
 
     pub fn player_shoot(&mut self) {
-        let cooldown = if Handle::power(self, &Effect::QuickShot) {
-            ATTACK_COOLDOWN / 2
-        } else {
-            ATTACK_COOLDOWN
-        };
-        if self.last_attack.elapsed() >= cooldown {
+        if self.last_attack.elapsed() >= self.cooldown_attack {
             self.player.shoot(Direction::Up);
-            if Handle::power(self, &Effect::Double) {
+            let double = Handle::power(self, &Effect::Double);
+            let triple = Handle::power(self, &Effect::Triple);
+            if double {
+                self.cooldown_attack = DOUBLE_ATTACK_COOLDOWN;
                 Handle::double(self);
             }
-            if Handle::power(self, &Effect::Triple) {
+            if triple {
+                self.cooldown_attack = TRIPLE_ATTACK_COOLDOWN;
                 Handle::triple(self);
+            }
+            if double && triple {
+                self.cooldown_attack = COMBINED_ATTACK_COOLDOWN;
+            }
+            if !double && !triple && !Handle::power(self, &Effect::QuickShot) {
+                self.cooldown_attack = ATTACK_COOLDOWN;
             }
             self.last_attack = Instant::now();
         }

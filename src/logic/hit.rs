@@ -21,16 +21,20 @@ impl Hit {
     pub fn powers(logic: &mut Logic) {
         let mut shields = false;
         let mut clear = false;
+        let mut quick = false;
         for bullet in logic.player.bullets() {
             logic.powers.retain(|power| {
                 if power.pos() != bullet.pos() {
                     true
                 } else {
-                    if *power.effect() == Effect::Clear {
+                    let effect = *power.effect();
+                    if effect == Effect::Clear {
                         clear = true;
                     } else {
-                        if *power.effect() == Effect::Shield {
+                        if effect == Effect::Shield {
                             shields = true;
+                        } else if effect == Effect::QuickShot {
+                            quick = true;
                         }
                         logic.effects.insert(*power.effect(), Instant::now());
                     }
@@ -40,6 +44,9 @@ impl Hit {
         }
         if Handle::power(logic, &Effect::Shield) && shields {
             Generate::shields(logic);
+        }
+        if Handle::power(logic, &Effect::QuickShot) && quick {
+            logic.cooldown_attack /= 2;
         }
         if clear {
             for enemy in logic.enemies.iter_mut() {
