@@ -75,22 +75,7 @@ impl Logic {
     pub fn player_shoot(&mut self) {
         if self.last_attack.elapsed() >= self.cooldown_attack {
             self.player.shoot(Direction::Up);
-            let double = Handle::power(self, &Effect::Double);
-            let triple = Handle::power(self, &Effect::Triple);
-            if double {
-                self.cooldown_attack = DOUBLE_ATTACK_COOLDOWN;
-                Handle::double(self);
-            }
-            if triple {
-                self.cooldown_attack = TRIPLE_ATTACK_COOLDOWN;
-                Handle::triple(self);
-            }
-            if double && triple {
-                self.cooldown_attack = COMBINED_ATTACK_COOLDOWN;
-            }
-            if !double && !triple && !Handle::power(self, &Effect::QuickShot) {
-                self.cooldown_attack = ATTACK_COOLDOWN;
-            }
+            Handle::attack(self);
             self.last_attack = Instant::now();
         }
     }

@@ -34,7 +34,7 @@ impl Hit {
                     } else {
                         if effect == Effect::Shield {
                             shields = true;
-                        } else if effect == Effect::QuickShot {
+                        } else if effect == Effect::Quickshot {
                             quick = true;
                         } else if effect == Effect::Follower {
                             follower = true;
@@ -51,7 +51,7 @@ impl Hit {
         if Handle::power(logic, &Effect::Follower) && follower {
             Generate::follower(logic);
         }
-        if Handle::power(logic, &Effect::QuickShot) && quick {
+        if Handle::power(logic, &Effect::Quickshot) && quick {
             logic.cooldown_attack /= 2;
         }
         if clear {
