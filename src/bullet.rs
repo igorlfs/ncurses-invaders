@@ -18,4 +18,12 @@ impl Bullet {
     pub fn shift(&mut self) {
         self.pos = util::shift(&self.pos, &self.dir);
     }
+
+    pub fn dir(&self) -> &Direction {
+        &self.dir
+    }
+
+    pub fn set_dir(&mut self, dir: Direction) {
+        self.dir = dir;
+    }
 }

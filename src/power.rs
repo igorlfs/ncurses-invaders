@@ -13,6 +13,7 @@ pub enum Effect {
     Inactivate,
     Pierce,
     QuickShot,
+    Reflect,
     Shield,
     Triple,
 }
@@ -25,7 +26,7 @@ impl fmt::Display for Effect {
 
 impl Distribution<Effect> for Standard {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Effect {
-        match rng.gen_range(0..=8) {
+        match rng.gen_range(0..=9) {
             0 => Effect::Antigravity,
             1 => Effect::Clear,
             2 => Effect::Double,
@@ -33,7 +34,8 @@ impl Distribution<Effect> for Standard {
             4 => Effect::Inactivate,
             5 => Effect::Pierce,
             6 => Effect::QuickShot,
-            7 => Effect::Shield,
+            7 => Effect::Reflect,
+            8 => Effect::Shield,
             _ => Effect::Triple,
         }
     }
