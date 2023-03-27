@@ -1,4 +1,4 @@
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
 use crate::power::Effect;
 
@@ -22,6 +22,7 @@ impl Hit {
         let mut shields = false;
         let mut clear = false;
         let mut quick = false;
+        let mut follower = false;
         for bullet in logic.player.bullets() {
             logic.powers.retain(|power| {
                 if power.pos() != bullet.pos() {
@@ -35,6 +36,8 @@ impl Hit {
                             shields = true;
                         } else if effect == Effect::QuickShot {
                             quick = true;
+                        } else if effect == Effect::Follower {
+                            follower = true;
                         }
                         logic.effects.insert(*power.effect(), Instant::now());
                     }
@@ -44,6 +47,9 @@ impl Hit {
         }
         if Handle::power(logic, &Effect::Shield) && shields {
             Generate::shields(logic);
+        }
+        if Handle::power(logic, &Effect::Follower) && follower {
+            Generate::follower(logic);
         }
         if Handle::power(logic, &Effect::QuickShot) && quick {
             logic.cooldown_attack /= 2;
@@ -76,7 +82,30 @@ impl Hit {
                             .retain(|bullet| bullet.pos() != shield.pos());
                     }
                 }
-                logic.shields.retain(|shield| shield.lives() > 0);
+                logic.shields.retain(|shield| shield.is_alive());
+            }
+        }
+    }
+
+    pub fn follower(logic: &mut Logic) {
+        if let Some(follower) = logic.follower.as_mut() {
+            for enemy in &logic.enemies {
+                for bullet in enemy.bullets() {
+                    if bullet.pos() == follower.pos() {
+                        follower.damage();
+                    }
+                }
+            }
+            for enemy in logic.enemies.iter_mut() {
+                enemy
+                    .bullets_mut()
+                    .retain(|bullet| bullet.pos() != follower.pos());
+            }
+            if !follower.is_alive() {
+                logic.follower = None;
+                logic
+                    .effects
+                    .insert(Effect::Follower, Instant::now() - Duration::from_secs(10));
             }
         }
     }

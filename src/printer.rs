@@ -112,6 +112,13 @@ impl Printer {
         wattroff(win, COLOR_PAIR(6));
     }
 
+    pub fn follower(win: WINDOW, follower: &Shield) {
+        wattron(win, COLOR_PAIR(3));
+        let pos = follower.pos();
+        mvwaddch(win, pos.0, pos.1, '_' as u32);
+        wattroff(win, COLOR_PAIR(3));
+    }
+
     pub fn enemies(win: WINDOW, enemies: &[Shooter]) {
         let bundle = Bundle {
             char_shooter: 'v' as u32,

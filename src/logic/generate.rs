@@ -31,6 +31,11 @@ impl Generate {
         }
     }
 
+    pub fn follower(logic: &mut Logic) {
+        let player_x = logic.player().pos().1;
+        logic.follower = Some(Shield::new((logic.height - 3, player_x), 1));
+    }
+
     pub fn boss(logic: &mut Logic) {
         if util::random_event(BOSS_PROPABILITY) && logic.boss.is_none() {
             logic.boss = Some(Boss::new(0));

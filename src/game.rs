@@ -79,6 +79,9 @@ impl Invaders {
         Printer::player(self.window, player);
         let shields = self.gate.shields();
         Printer::shields(self.window, shields);
+        if let Some(follower) = self.gate.follower() {
+            Printer::follower(self.window, follower);
+        }
         if let Some(boss) = self.gate.boss() {
             Printer::boss(self.window, boss);
         }

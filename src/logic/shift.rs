@@ -12,6 +12,14 @@ impl Move {
             }
         }
     }
+
+    pub fn follower(logic: &mut Logic) {
+        let player_x = logic.player().pos().1;
+        if let Some(follower) = logic.follower.as_mut() {
+            follower.set_x(player_x);
+        }
+    }
+
     pub fn bullets(logic: &mut Logic) {
         let reflect = Handle::power(logic, &Effect::Reflect);
         for bullet in logic.player.bullets_mut() {

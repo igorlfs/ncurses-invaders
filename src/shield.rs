@@ -16,7 +16,11 @@ impl Shield {
         self.lives -= 1;
     }
 
-    pub fn lives(&self) -> i8 {
-        self.lives
+    pub fn set_x(&mut self, x: i32) {
+        self.pos.1 = x;
+    }
+
+    pub fn is_alive(&self) -> bool {
+        self.lives > 0
     }
 }

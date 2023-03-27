@@ -37,6 +37,7 @@ pub struct Logic {
     player: Shooter,
     powers: Vec<PowerUp>,
     shields: Vec<Shield>,
+    follower: Option<Shield>,
     effects: HashMap<Effect, Instant>,
     boss: Option<Boss>,
     height: i32,
@@ -56,6 +57,7 @@ impl Logic {
             effects: HashMap::new(),
             shields: vec![],
             player: Shooter::new((y - 2, x / 2)),
+            follower: None,
             boss: None,
             height: y,
             width: x,
@@ -95,6 +97,7 @@ impl Logic {
 
     pub fn player_move(&mut self, direction: &Direction) {
         self.player.shift(direction);
+        Move::follower(self);
     }
 
     pub fn generate(&mut self) {
@@ -112,6 +115,7 @@ impl Logic {
     pub fn hit(&mut self, score: &mut i32, level: &i32) -> bool {
         Hit::powers(self);
         Hit::shields(self);
+        Hit::follower(self);
         if Hit::boss(self) {
             *score += BOSS_SCORE * level;
         }
@@ -196,5 +200,9 @@ impl Logic {
             }
         }
         effects
+    }
+
+    pub fn follower(&self) -> Option<&Shield> {
+        self.follower.as_ref()
     }
 }
