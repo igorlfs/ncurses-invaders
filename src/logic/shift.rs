@@ -46,7 +46,7 @@ impl Move {
     }
 
     pub fn enemies(logic: &mut Logic) -> bool {
-        if !Handle::power(logic, &Effect::Inactivate) {
+        if !Handle::power(logic, &Effect::Lock) {
             let (left, right) = get_outermost_lateral_indexes(&logic.enemies);
 
             if logic.dir == Direction::Right && logic.enemies[right].pos().1 == logic.width - 2
