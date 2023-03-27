@@ -1,5 +1,5 @@
 use super::{handle::Handle, Logic};
-use crate::{direction::Direction, power::Effect, util};
+use crate::{direction::Direction, power::Effect, shooter::Shooter, util};
 
 pub struct Move;
 
@@ -44,4 +44,47 @@ impl Move {
             enemy.clear_bullets();
         }
     }
+
+    pub fn enemies(logic: &mut Logic) -> bool {
+        if !Handle::power(logic, &Effect::Inactivate) {
+            let (left, right) = get_outermost_lateral_indexes(&logic.enemies);
+
+            if logic.dir == Direction::Right && logic.enemies[right].pos().1 == logic.width - 2
+                || logic.enemies[left].pos().1 == 1 && logic.dir == Direction::Left
+            {
+                logic.dir = Direction::Down;
+            } else if logic.dir == Direction::Down
+                && logic.enemies[right].pos().1 == logic.width - 2
+            {
+                logic.dir = Direction::Left;
+            } else if logic.dir == Direction::Down && logic.enemies[left].pos().1 == 1 {
+                logic.dir = Direction::Right;
+            }
+
+            if !(logic.dir == Direction::Down) || !Handle::power(logic, &Effect::Antigravity) {
+                for enemy in logic.enemies.iter_mut() {
+                    enemy.shift(&logic.dir);
+                }
+            }
+        }
+
+        if let Some(bottom) = logic.enemies.last() {
+            bottom.pos().0 == logic.height - 2
+        } else {
+            false
+        }
+    }
+}
+
+fn get_outermost_lateral_indexes(shooters: &[Shooter]) -> (usize, usize) {
+    let mut left_index = 0;
+    let mut right_index = 0;
+    for i in 1..shooters.len() {
+        if shooters[i].pos().1 <= shooters[left_index].pos().1 {
+            left_index = i;
+        } else if shooters[i].pos().1 >= shooters[right_index].pos().1 {
+            right_index = i;
+        }
+    }
+    (left_index, right_index)
 }

@@ -94,7 +94,7 @@ impl Logic {
     pub fn shift(&mut self) -> bool {
         Move::bullets(self);
         Move::boss(self);
-        self.move_enemies()
+        Move::enemies(self)
     }
 
     pub fn hit(&mut self, score: &mut i32, level: &i32) -> bool {
@@ -106,55 +106,6 @@ impl Logic {
         }
         *score += (Hit::enemies(self) as i32) * ENEMY_SCORE * level;
         Hit::player(self)
-    }
-
-    fn get_horizontal_indexes(&self) -> (usize, usize) {
-        let mut left_index = 0;
-        let mut right_index = 0;
-        let enemies = self.enemies();
-        for i in 1..enemies.len() {
-            if enemies[i].pos().1 <= enemies[left_index].pos().1 {
-                left_index = i;
-            } else if enemies[i].pos().1 >= enemies[right_index].pos().1 {
-                right_index = i;
-            }
-        }
-        (left_index, right_index)
-    }
-
-    fn get_bottom(&self) -> i32 {
-        let mut bottom = 0;
-        let enemies = self.enemies();
-        for i in 1..enemies.len() {
-            if enemies[bottom].pos().0 <= enemies[i].pos().0 {
-                bottom = i;
-            }
-        }
-        enemies[bottom].pos().0
-    }
-
-    pub fn move_enemies(&mut self) -> bool {
-        if !Handle::power(self, &Effect::Inactivate) {
-            let (left, right) = self.get_horizontal_indexes();
-
-            if self.dir == Direction::Right && self.enemies[right].pos().1 == self.width - 2
-                || self.enemies[left].pos().1 == 1 && self.dir == Direction::Left
-            {
-                self.dir = Direction::Down;
-            } else if self.dir == Direction::Down && self.enemies[right].pos().1 == self.width - 2 {
-                self.dir = Direction::Left;
-            } else if self.dir == Direction::Down && self.enemies[left].pos().1 == 1 {
-                self.dir = Direction::Right;
-            }
-
-            if !(self.dir == Direction::Down) || !Handle::power(self, &Effect::Antigravity) {
-                for enemy in self.enemies.iter_mut() {
-                    enemy.shift(&self.dir);
-                }
-            }
-        }
-
-        self.get_bottom() == self.height - 2
     }
 
     pub fn enemies(&self) -> &[Shooter] {
