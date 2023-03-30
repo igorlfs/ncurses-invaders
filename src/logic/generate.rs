@@ -38,7 +38,7 @@ impl Generate {
 
     pub fn boss(logic: &mut Logic) {
         if util::random_event(BOSS_PROPABILITY) && logic.boss.is_none() {
-            logic.boss = Some(Boss::new(0));
+            logic.boss = Some(Boss::new(1));
         }
     }
 
