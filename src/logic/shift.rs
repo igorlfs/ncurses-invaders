@@ -20,6 +20,15 @@ impl Move {
         }
     }
 
+    pub fn lasers(logic: &mut Logic) {
+        for enemy in logic.enemies.iter_mut() {
+            for bullet in enemy.bullets_mut() {
+                bullet.shift();
+            }
+            enemy.clear_bullets();
+        }
+    }
+
     pub fn bullets(logic: &mut Logic) {
         let reflect = Handle::power(logic, &Effect::Reflect);
         for bullet in logic.player.bullets_mut() {
@@ -36,13 +45,6 @@ impl Move {
             }
         }
         logic.player.clear_bullets();
-
-        for enemy in logic.enemies.iter_mut() {
-            for bullet in enemy.bullets_mut() {
-                bullet.shift();
-            }
-            enemy.clear_bullets();
-        }
     }
 
     pub fn enemies(logic: &mut Logic) -> bool {

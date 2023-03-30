@@ -45,6 +45,7 @@ pub struct Logic {
     dir: Direction,
     last_attack: Instant,
     cooldown_attack: Duration,
+    score_increment: i32,
 }
 
 impl Logic {
@@ -64,6 +65,7 @@ impl Logic {
             dir: Direction::Right,
             last_attack: Instant::now(),
             cooldown_attack: ATTACK_COOLDOWN,
+            score_increment: 0,
         }
     }
 
@@ -91,20 +93,19 @@ impl Logic {
         Generate::boss(self);
     }
 
-    pub fn shift(&mut self) -> bool {
+    pub fn shift(&mut self, level: &i32) -> bool {
         Move::bullets(self);
+        Hit::moving(self, level);
+        Move::lasers(self);
         Move::boss(self);
         Move::enemies(self)
     }
 
-    pub fn hit(&mut self, score: &mut i32, level: &i32) -> bool {
+    pub fn hit(&mut self, level: &i32) -> bool {
         Hit::powers(self);
         Hit::shields(self);
         Hit::follower(self);
-        if Hit::boss(self) {
-            *score += BOSS_SCORE * level;
-        }
-        *score += (Hit::enemies(self) as i32) * ENEMY_SCORE * level;
+        Hit::moving(self, level);
         Hit::player(self)
     }
 
@@ -140,5 +141,13 @@ impl Logic {
 
     pub fn follower(&self) -> Option<&Shield> {
         self.follower.as_ref()
+    }
+
+    pub fn score_increment(&self) -> i32 {
+        self.score_increment
+    }
+
+    pub fn score_reset(&mut self) {
+        self.score_increment = 0;
     }
 }

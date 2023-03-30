@@ -1,8 +1,8 @@
 use std::time::{Duration, Instant};
 
-use crate::power::Effect;
+use crate::{bullet::Bullet, power::Effect};
 
-use super::{generate::Generate, handle::Handle, Logic, POWER_COOLDOWN};
+use super::{generate::Generate, handle::Handle, Logic, BOSS_SCORE, ENEMY_SCORE, POWER_COOLDOWN};
 
 pub struct Hit;
 
@@ -140,5 +140,12 @@ impl Hit {
         }
         let new_size = logic.enemies.len();
         previous_size - new_size
+    }
+
+    pub fn moving(logic: &mut Logic, level: &i32) {
+        if Hit::boss(logic) {
+            logic.score_increment += BOSS_SCORE * level;
+        }
+        logic.score_increment += (Hit::enemies(logic) as i32) * ENEMY_SCORE * level;
     }
 }

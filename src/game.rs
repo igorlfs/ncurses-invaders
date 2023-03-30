@@ -58,12 +58,14 @@ impl Invaders {
 
         if self.last_update.elapsed() >= UPDATE_COOLDOWN {
             self.gate.generate();
-            if self.gate.shift() {
+            if self.gate.shift(&self.level) {
                 self.ships = -1;
             }
-            if self.gate.hit(&mut self.score, &self.level) {
+            if self.gate.hit(&self.level) {
                 self.ships -= 1;
             }
+            self.score += self.gate.score_increment();
+            self.gate.score_reset();
             self.last_update = Instant::now();
         }
     }
