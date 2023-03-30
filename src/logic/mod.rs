@@ -76,7 +76,8 @@ impl Logic {
 
     pub fn player_shoot(&mut self) {
         if self.last_attack.elapsed() >= self.cooldown_attack {
-            self.player.shoot(Direction::Up);
+            self.player
+                .shoot(Direction::Up, Handle::power(self, &Effect::Grenade));
             Handle::attack(self);
             self.last_attack = Instant::now();
         }

@@ -126,18 +126,30 @@ impl Hit {
     pub fn enemies(logic: &mut Logic) -> usize {
         let previous_size = logic.enemies.len();
         let enemies_copy = logic.enemies.to_vec();
+        let mut exploding_bullets: Vec<Bullet> = vec![];
         for bullet in logic.player.bullets().iter() {
             logic.enemies.retain(|enemy| enemy.pos() != bullet.pos());
         }
 
         if !Handle::power(logic, &Effect::Pierce) {
             for enemy in enemies_copy {
-                logic
-                    .player
-                    .bullets_mut()
-                    .retain(|bullet| bullet.pos() != enemy.pos());
+                logic.player.bullets_mut().retain(|bullet| {
+                    if bullet.pos() == enemy.pos() {
+                        exploding_bullets.push(bullet.clone());
+                        false
+                    } else {
+                        true
+                    }
+                });
             }
         }
+
+        for bullet in exploding_bullets {
+            if bullet.is_explosive() {
+                logic.player.shoot_pos(&bullet.pos(), rand::random(), false);
+            }
+        }
+
         let new_size = logic.enemies.len();
         previous_size - new_size
     }

@@ -21,16 +21,23 @@ impl Handle {
         logic.cooldown_attack = DOUBLE_ATTACK_COOLDOWN;
         let player_pos = logic.player.pos();
         let pos = (player_pos.0 - 1, player_pos.1);
-        logic.player.shoot_pos(&pos, Direction::Up);
+        logic
+            .player
+            .shoot_pos(&pos, Direction::Up, Handle::power(logic, &Effect::Grenade));
     }
 
     fn triple(logic: &mut Logic) {
         logic.cooldown_attack = TRIPLE_ATTACK_COOLDOWN;
         let player_pos = logic.player.pos();
         let pos_left = (player_pos.0 - 1, player_pos.1 + 1);
-        logic.player.shoot_pos(&pos_left, Direction::LeftUp);
+        let grenade = Handle::power(logic, &Effect::Grenade);
+        logic
+            .player
+            .shoot_pos(&pos_left, Direction::LeftUp, grenade);
         let pos_right = (player_pos.0 - 1, player_pos.1 - 1);
-        logic.player.shoot_pos(&pos_right, Direction::RightUp);
+        logic
+            .player
+            .shoot_pos(&pos_right, Direction::RightUp, grenade);
     }
 
     pub fn attack(logic: &mut Logic) {

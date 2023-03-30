@@ -55,7 +55,7 @@ impl Generate {
         if !Handle::power(logic, &Effect::Hijack) {
             for enemy in logic.enemies.iter_mut() {
                 if util::random_event(FIRE_PROBABILITY) {
-                    enemy.shoot(Direction::Down);
+                    enemy.shoot(Direction::Down, false);
                 }
             }
         }

@@ -40,12 +40,12 @@ impl Shooter {
             .retain(|bullet| !util::out_of_bounds(bullet.pos()))
     }
 
-    pub fn shoot(&mut self, dir: Direction) {
+    pub fn shoot(&mut self, dir: Direction, is_explosive: bool) {
         let pos = self.pos();
-        self.bullets.push_back(Bullet::new(pos, dir));
+        self.bullets.push_back(Bullet::new(pos, dir, is_explosive));
     }
 
-    pub fn shoot_pos(&mut self, pos: &(i32, i32), dir: Direction) {
-        self.bullets.push_back(Bullet::new(*pos, dir));
+    pub fn shoot_pos(&mut self, pos: &(i32, i32), dir: Direction, is_explosive: bool) {
+        self.bullets.push_back(Bullet::new(*pos, dir, is_explosive));
     }
 }

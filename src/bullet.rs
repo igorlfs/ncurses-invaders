@@ -4,11 +4,16 @@ use crate::{direction::Direction, util};
 pub struct Bullet {
     pos: (i32, i32),
     dir: Direction,
+    is_explosive: bool,
 }
 
 impl Bullet {
-    pub fn new(pos: (i32, i32), dir: Direction) -> Self {
-        Self { pos, dir }
+    pub fn new(pos: (i32, i32), dir: Direction, is_explosive: bool) -> Self {
+        Self {
+            pos,
+            dir,
+            is_explosive,
+        }
     }
 
     pub fn pos(&self) -> (i32, i32) {
@@ -25,5 +30,9 @@ impl Bullet {
 
     pub fn set_dir(&mut self, dir: Direction) {
         self.dir = dir;
+    }
+
+    pub fn is_explosive(&self) -> bool {
+        self.is_explosive
     }
 }
