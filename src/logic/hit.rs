@@ -126,9 +126,18 @@ impl Hit {
     pub fn enemies(logic: &mut Logic) -> usize {
         let previous_size = logic.enemies.len();
         let enemies_copy = logic.enemies.to_vec();
+        let mind_control = Handle::power(logic, &Effect::Mindcontrol);
+        let player_bullets_copy = logic.player.bullets().clone();
         let mut exploding_bullets: Vec<Bullet> = vec![];
-        for bullet in logic.player.bullets().iter() {
-            logic.enemies.retain(|enemy| enemy.pos() != bullet.pos());
+        for bullet in player_bullets_copy {
+            for enemy in logic.enemies_mut() {
+                if enemy.pos() == bullet.pos() && mind_control {
+                    enemy.mind_control();
+                }
+            }
+            if !mind_control {
+                logic.enemies.retain(|enemy| enemy.pos() != bullet.pos());
+            }
         }
 
         if !Handle::power(logic, &Effect::Pierce) {

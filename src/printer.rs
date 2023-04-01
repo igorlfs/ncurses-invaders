@@ -18,6 +18,16 @@ struct Bundle {
     color_bullet: i16,
 }
 
+const COLOR_LASER: i16 = 1;
+const COLOR_FOE: i16 = 2;
+const COLOR_SHIP: i16 = 3;
+const COLOR_FOLLOWER: i16 = COLOR_SHIP;
+const COLOR_BULLET: i16 = 4;
+const COLOR_ALLY: i16 = 4;
+const COLOR_POWER: i16 = 5;
+const COLOR_SHIELD: i16 = 6;
+const COLOR_BOSS: i16 = 8;
+
 impl Printer {
     pub fn clear(win: WINDOW) {
         let x = getmaxx(win);
@@ -88,43 +98,43 @@ impl Printer {
     }
 
     pub fn powers(win: WINDOW, powers: &[PowerUp]) {
-        wattron(win, COLOR_PAIR(5));
+        wattron(win, COLOR_PAIR(COLOR_POWER));
         for power in powers {
             let pos = power.pos();
             mvwaddch(win, pos.0, pos.1, power.char());
         }
-        wattroff(win, COLOR_PAIR(5));
+        wattroff(win, COLOR_PAIR(COLOR_POWER));
     }
 
     pub fn boss(win: WINDOW, boss: &Boss) {
-        wattron(win, COLOR_PAIR(8));
+        wattron(win, COLOR_PAIR(COLOR_BOSS));
         mvwaddch(win, 2, boss.left_pos(), '\\' as u32);
         mvwaddch(win, 2, boss.left_pos() + 1, '/' as u32);
-        wattroff(win, COLOR_PAIR(8));
+        wattroff(win, COLOR_PAIR(COLOR_BOSS));
     }
 
     pub fn shields(win: WINDOW, shields: &[Shield]) {
-        wattron(win, COLOR_PAIR(6));
+        wattron(win, COLOR_PAIR(COLOR_SHIELD));
         for shield in shields {
             let pos = shield.pos();
             mvwaddch(win, pos.0, pos.1, '_' as u32);
         }
-        wattroff(win, COLOR_PAIR(6));
+        wattroff(win, COLOR_PAIR(COLOR_SHIELD));
     }
 
     pub fn follower(win: WINDOW, follower: &Shield) {
-        wattron(win, COLOR_PAIR(3));
+        wattron(win, COLOR_PAIR(COLOR_FOLLOWER));
         let pos = follower.pos();
         mvwaddch(win, pos.0, pos.1, '_' as u32);
-        wattroff(win, COLOR_PAIR(3));
+        wattroff(win, COLOR_PAIR(COLOR_FOLLOWER));
     }
 
     pub fn enemies(win: WINDOW, enemies: &[Shooter]) {
         let bundle = Bundle {
             char_shooter: 'v' as u32,
-            color_shooter: 2,
+            color_shooter: COLOR_FOE,
             char_bullet: ':' as u32,
-            color_bullet: 1,
+            color_bullet: COLOR_LASER,
         };
         for enemy in enemies {
             Printer::shooter_helper(win, enemy, &bundle);
@@ -134,18 +144,23 @@ impl Printer {
     pub fn player(win: WINDOW, player: &Shooter) {
         let bundle = Bundle {
             char_shooter: '^' as u32,
-            color_shooter: 3,
+            color_shooter: COLOR_SHIP,
             char_bullet: '.' as u32,
-            color_bullet: 4,
+            color_bullet: COLOR_BULLET,
         };
         Printer::shooter_helper(win, player, &bundle);
     }
 
     fn shooter_helper(win: WINDOW, shooter: &Shooter, bundle: &Bundle) {
-        wattron(win, COLOR_PAIR(bundle.color_shooter));
+        let color_shooter = if shooter.is_mind_controlled() {
+            COLOR_ALLY
+        } else {
+            bundle.color_shooter
+        };
+        wattron(win, COLOR_PAIR(color_shooter));
         let pos = shooter.pos();
         mvwaddch(win, pos.0, pos.1, bundle.char_shooter);
-        wattroff(win, COLOR_PAIR(bundle.color_shooter));
+        wattroff(win, COLOR_PAIR(color_shooter));
 
         wattron(win, COLOR_PAIR(bundle.color_bullet));
 

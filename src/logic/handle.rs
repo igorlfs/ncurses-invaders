@@ -17,6 +17,12 @@ impl Handle {
         false
     }
 
+    pub fn mind_control(logic: &mut Logic) {
+        if !Handle::power(logic, &Effect::Mindcontrol) {
+            logic.enemies.retain(|enemy| !enemy.is_mind_controlled())
+        }
+    }
+
     fn double(logic: &mut Logic) {
         logic.cooldown_attack = DOUBLE_ATTACK_COOLDOWN;
         let player_pos = logic.player.pos();

@@ -107,6 +107,7 @@ impl Logic {
         Hit::shields(self);
         Hit::follower(self);
         Hit::moving(self, level);
+        Handle::mind_control(self);
         Hit::player(self)
     }
 
@@ -150,5 +151,9 @@ impl Logic {
 
     pub fn score_reset(&mut self) {
         self.score_increment = 0;
+    }
+
+    pub fn enemies_mut(&mut self) -> &mut Vec<Shooter> {
+        &mut self.enemies
     }
 }

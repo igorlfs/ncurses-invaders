@@ -6,6 +6,7 @@ use crate::{bullet::Bullet, direction::Direction, util};
 pub struct Shooter {
     pos: (i32, i32),
     bullets: VecDeque<Bullet>,
+    is_mind_controlled: bool,
 }
 
 impl Shooter {
@@ -13,6 +14,7 @@ impl Shooter {
         Self {
             pos,
             bullets: VecDeque::new(),
+            is_mind_controlled: false,
         }
     }
 
@@ -47,5 +49,13 @@ impl Shooter {
 
     pub fn shoot_pos(&mut self, pos: &(i32, i32), dir: Direction, is_explosive: bool) {
         self.bullets.push_back(Bullet::new(*pos, dir, is_explosive));
+    }
+
+    pub fn is_mind_controlled(&self) -> bool {
+        self.is_mind_controlled
+    }
+
+    pub fn mind_control(&mut self) {
+        self.is_mind_controlled = true;
     }
 }

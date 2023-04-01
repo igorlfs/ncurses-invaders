@@ -55,7 +55,11 @@ impl Generate {
         if !Handle::power(logic, &Effect::Hijack) {
             for enemy in logic.enemies.iter_mut() {
                 if util::random_event(FIRE_PROBABILITY) {
-                    enemy.shoot(Direction::Down, false);
+                    if enemy.is_mind_controlled() {
+                        logic.player.shoot_pos(&enemy.pos(), rand::random(), false);
+                    } else {
+                        enemy.shoot(Direction::Down, false);
+                    }
                 }
             }
         }
