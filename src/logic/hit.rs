@@ -154,7 +154,31 @@ impl Hit {
         previous_size - new_size
     }
 
+    pub fn lasers(logic: &mut Logic) {
+        let enemies_copy = logic.enemies.to_vec();
+
+        for bullet in logic.player.bullets_mut() {
+            for enemy in logic.enemies.iter_mut() {
+                enemy
+                    .bullets_mut()
+                    .retain(|laser| laser.pos() != bullet.pos());
+            }
+        }
+
+        for enemy in enemies_copy {
+            for laser in enemy.bullets() {
+                logic
+                    .player
+                    .bullets_mut()
+                    .retain(|bullet| bullet.pos() != laser.pos())
+            }
+        }
+    }
+
     pub fn moving(logic: &mut Logic, level: &i32) {
+        if Handle::power(logic, &Effect::Block) {
+            Hit::lasers(logic);
+        }
         if Hit::boss(logic) {
             logic.score_increment += BOSS_SCORE * level;
         }

@@ -8,6 +8,7 @@ use std::fmt;
 pub enum Effect {
     Antigravity,
     Clear,
+    Block,
     Double,
     Follower,
     Grenade,
@@ -30,16 +31,17 @@ impl Distribution<Effect> for Standard {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Effect {
         match rng.gen_range(0..=11) {
             0 => Effect::Antigravity,
-            1 => Effect::Clear,
-            2 => Effect::Double,
-            3 => Effect::Follower,
-            4 => Effect::Grenade,
-            5 => Effect::Hijack,
-            6 => Effect::Lock,
-            7 => Effect::Pierce,
-            8 => Effect::Quickshot,
-            9 => Effect::Reflect,
-            10 => Effect::Shield,
+            1 => Effect::Block,
+            2 => Effect::Clear,
+            3 => Effect::Double,
+            4 => Effect::Follower,
+            5 => Effect::Grenade,
+            6 => Effect::Hijack,
+            7 => Effect::Lock,
+            8 => Effect::Pierce,
+            9 => Effect::Quickshot,
+            10 => Effect::Reflect,
+            11 => Effect::Shield,
             _ => Effect::Triple,
         }
     }
