@@ -22,6 +22,7 @@ pub enum Effect {
     Shield,
     Triple,
     Warp,
+    Zombify,
 }
 
 impl fmt::Display for Effect {
@@ -32,7 +33,7 @@ impl fmt::Display for Effect {
 
 impl Distribution<Effect> for Standard {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Effect {
-        match rng.gen_range(0..=15) {
+        match rng.gen_range(0..=16) {
             0 => Effect::Antigravity,
             1 => Effect::Block,
             2 => Effect::Clear,
@@ -40,7 +41,7 @@ impl Distribution<Effect> for Standard {
             4 => Effect::Follower,
             5 => Effect::Grenade,
             6 => Effect::Hijack,
-            7 => Effect::Hijack,
+            7 => Effect::Invincible,
             8 => Effect::Lock,
             9 => Effect::Mindcontrol,
             10 => Effect::Pierce,
@@ -48,7 +49,8 @@ impl Distribution<Effect> for Standard {
             12 => Effect::Reflect,
             13 => Effect::Shield,
             14 => Effect::Triple,
-            _ => Effect::Warp,
+            15 => Effect::Warp,
+            _ => Effect::Zombify,
         }
     }
 }

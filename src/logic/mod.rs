@@ -46,6 +46,7 @@ pub struct Logic {
     last_attack: Instant,
     cooldown_attack: Duration,
     score_increment: i32,
+    slow_down: bool,
 }
 
 impl Logic {
@@ -66,6 +67,7 @@ impl Logic {
             last_attack: Instant::now(),
             cooldown_attack: ATTACK_COOLDOWN,
             score_increment: 0,
+            slow_down: false,
         }
     }
 
@@ -97,9 +99,7 @@ impl Logic {
     pub fn shift(&mut self, level: &i32) -> bool {
         Move::bullets(self);
         Hit::moving(self, level);
-        Move::lasers(self);
-        Move::boss(self);
-        Move::enemies(self)
+        Move::foes(self)
     }
 
     pub fn hit(&mut self, level: &i32) -> bool {

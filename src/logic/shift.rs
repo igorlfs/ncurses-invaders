@@ -33,6 +33,20 @@ impl Move {
         }
     }
 
+    pub fn foes(logic: &mut Logic) -> bool {
+        if Handle::power(logic, &Effect::Zombify) {
+            logic.slow_down = !logic.slow_down;
+        } else {
+            logic.slow_down = false;
+        }
+        if !logic.slow_down {
+            Move::lasers(logic);
+            Move::boss(logic);
+            return Move::enemies(logic);
+        }
+        false
+    }
+
     pub fn lasers(logic: &mut Logic) {
         for enemy in logic.enemies.iter_mut() {
             for bullet in enemy.bullets_mut() {
