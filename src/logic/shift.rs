@@ -13,6 +13,19 @@ impl Move {
         }
     }
 
+    pub fn player(logic: &mut Logic, direction: &Direction) {
+        let new_pos = logic.player.new_pos(direction);
+        let warp = Handle::power(logic, &Effect::Warp) && util::out_of_bounds(new_pos);
+
+        if *direction == Direction::Left && warp {
+            logic.player.set_pos((logic.height - 2, logic.width - 2));
+        } else if *direction == Direction::Right && warp {
+            logic.player.set_pos((logic.height - 2, 1));
+        } else {
+            logic.player.shift(direction);
+        }
+    }
+
     pub fn follower(logic: &mut Logic) {
         let player_x = logic.player().pos().1;
         if let Some(follower) = logic.follower.as_mut() {

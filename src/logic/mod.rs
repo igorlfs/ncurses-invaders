@@ -84,7 +84,7 @@ impl Logic {
     }
 
     pub fn player_move(&mut self, direction: &Direction) {
-        self.player.shift(direction);
+        Move::player(self, direction);
         Move::follower(self);
     }
 

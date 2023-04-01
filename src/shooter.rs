@@ -22,6 +22,10 @@ impl Shooter {
         self.pos
     }
 
+    pub fn new_pos(&self, dir: &Direction) -> (i32, i32) {
+        util::shift(&self.pos, dir)
+    }
+
     pub fn shift(&mut self, dir: &Direction) {
         let new_pos = util::shift(&self.pos, dir);
         if !util::out_of_bounds(new_pos) {
@@ -57,5 +61,9 @@ impl Shooter {
 
     pub fn mind_control(&mut self) {
         self.is_mind_controlled = true;
+    }
+
+    pub fn set_pos(&mut self, pos: (i32, i32)) {
+        self.pos = pos;
     }
 }
