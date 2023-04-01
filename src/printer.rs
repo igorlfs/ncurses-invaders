@@ -143,7 +143,7 @@ impl Printer {
 
     pub fn player(win: WINDOW, player: &Shooter) {
         let bundle = Bundle {
-            char_shooter: '^' as u32,
+            char_shooter: '*' as u32,
             color_shooter: COLOR_SHIP,
             char_bullet: '.' as u32,
             color_bullet: COLOR_BULLET,

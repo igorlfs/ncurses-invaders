@@ -81,6 +81,9 @@ impl Invaders {
         Printer::player(self.window, player);
         let shields = self.gate.shields();
         Printer::shields(self.window, shields);
+        if let Some(xerox) = self.gate.xerox() {
+            Printer::player(self.window, xerox);
+        }
         if let Some(follower) = self.gate.follower() {
             Printer::follower(self.window, follower);
         }

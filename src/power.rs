@@ -22,6 +22,7 @@ pub enum Effect {
     Shield,
     Triple,
     Warp,
+    Xerox,
     Zombify,
 }
 
@@ -33,7 +34,7 @@ impl fmt::Display for Effect {
 
 impl Distribution<Effect> for Standard {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Effect {
-        match rng.gen_range(0..=16) {
+        match rng.gen_range(0..=17) {
             0 => Effect::Antigravity,
             1 => Effect::Block,
             2 => Effect::Clear,
@@ -50,6 +51,7 @@ impl Distribution<Effect> for Standard {
             13 => Effect::Shield,
             14 => Effect::Triple,
             15 => Effect::Warp,
+            16 => Effect::Xerox,
             _ => Effect::Zombify,
         }
     }

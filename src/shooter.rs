@@ -66,4 +66,8 @@ impl Shooter {
     pub fn set_pos(&mut self, pos: (i32, i32)) {
         self.pos = pos;
     }
+
+    pub fn set_y(&mut self, y: i32) {
+        self.pos.1 = y;
+    }
 }

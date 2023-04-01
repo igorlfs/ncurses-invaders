@@ -31,6 +31,21 @@ impl Generate {
         }
     }
 
+    pub fn xerox(logic: &mut Logic) {
+        let xerox = Handle::power(logic, &Effect::Xerox);
+        if logic.xerox.is_none() && xerox {
+            let player_pos = logic.player.pos();
+            let y = logic.width - player_pos.1;
+            logic.xerox = Some(Shooter::new((player_pos.0, y)));
+            if let Some(xerox) = &mut logic.xerox {
+                xerox.mind_control();
+            }
+        }
+        if !xerox {
+            logic.xerox = None
+        }
+    }
+
     pub fn follower(logic: &mut Logic) {
         let player_x = logic.player().pos().1;
         logic.follower = Some(Shield::new((logic.height - 3, player_x), 1));

@@ -24,6 +24,12 @@ impl Move {
         } else {
             logic.player.shift(direction);
         }
+
+        if let Some(xerox) = &mut logic.xerox {
+            let player_pos = logic.player.pos();
+            let y = logic.width - player_pos.1;
+            xerox.set_y(y);
+        }
     }
 
     pub fn follower(logic: &mut Logic) {

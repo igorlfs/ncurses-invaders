@@ -47,6 +47,9 @@ impl Handle {
     }
 
     pub fn attack(logic: &mut Logic) {
+        if let Some(xerox) = &logic.xerox {
+            logic.player.shoot_pos(&xerox.pos(), Direction::Up, false);
+        }
         let double = Handle::power(logic, &Effect::Double);
         let triple = Handle::power(logic, &Effect::Triple);
         if double {

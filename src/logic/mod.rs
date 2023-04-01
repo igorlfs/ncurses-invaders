@@ -46,6 +46,7 @@ pub struct Logic {
     last_attack: Instant,
     cooldown_attack: Duration,
     score_increment: i32,
+    xerox: Option<Shooter>,
     slow_down: bool,
 }
 
@@ -61,6 +62,7 @@ impl Logic {
             player: Shooter::new((y - 2, x / 2)),
             follower: None,
             boss: None,
+            xerox: None,
             height: y,
             width: x,
             dir: Direction::Right,
@@ -94,6 +96,7 @@ impl Logic {
         Generate::enemy_attack(self);
         Generate::power(self);
         Generate::boss(self);
+        Generate::xerox(self);
     }
 
     pub fn shift(&mut self, level: &i32) -> bool {
@@ -155,5 +158,9 @@ impl Logic {
 
     pub fn enemies_mut(&mut self) -> &mut Vec<Shooter> {
         &mut self.enemies
+    }
+
+    pub fn xerox(&self) -> Option<&Shooter> {
+        self.xerox.as_ref()
     }
 }
