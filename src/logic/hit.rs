@@ -8,10 +8,12 @@ pub struct Hit;
 
 impl Hit {
     pub fn player(logic: &Logic) -> bool {
-        for enemy in logic.enemies.iter() {
-            for bullet in enemy.bullets() {
-                if bullet.pos() == logic.player.pos() {
-                    return true;
+        if !Handle::power(logic, &Effect::Invincible) {
+            for enemy in logic.enemies.iter() {
+                for bullet in enemy.bullets() {
+                    if bullet.pos() == logic.player.pos() {
+                        return true;
+                    }
                 }
             }
         }
