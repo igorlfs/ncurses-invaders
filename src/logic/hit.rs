@@ -7,9 +7,23 @@ use super::{generate::Generate, handle::Handle, Logic, BOSS_SCORE, ENEMY_SCORE, 
 pub struct Hit;
 
 impl Hit {
-    pub fn player(logic: &Logic) -> bool {
+    pub fn player(logic: &mut Logic) -> bool {
+        let enemies_copy = logic.enemies.to_vec();
+
+        if Handle::power(logic, &Effect::Vendetta) {
+            logic.enemies.retain(|enemy| {
+                let mut retain = true;
+                for bullet in enemy.bullets() {
+                    if bullet.pos() == logic.player.pos() {
+                        retain = false;
+                    }
+                }
+                retain
+            })
+        }
+
         if !Handle::power(logic, &Effect::Invincible) {
-            for enemy in logic.enemies.iter() {
+            for enemy in enemies_copy {
                 for bullet in enemy.bullets() {
                     if bullet.pos() == logic.player.pos() {
                         return true;
