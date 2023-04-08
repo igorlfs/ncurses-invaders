@@ -31,12 +31,14 @@ const POWER_PROBABILITY: f32 = 0.08;
 const FIRE_PROBABILITY: f32 = 0.05;
 const BOSS_PROPABILITY: f32 = 0.001;
 const SHIELDS: i32 = 14;
+const OBSTACLES: i32 = 4;
 
 pub struct Logic {
     enemies: Vec<Shooter>,
     player: Shooter,
     powers: Vec<PowerUp>,
     shields: Vec<Shield>,
+    obstacles: Vec<Shield>,
     follower: Option<Shield>,
     effects: HashMap<Effect, Instant>,
     boss: Option<Boss>,
@@ -59,6 +61,7 @@ impl Logic {
             powers: vec![],
             effects: HashMap::new(),
             shields: vec![],
+            obstacles: vec![],
             player: Shooter::new((y - 2, x / 2)),
             follower: None,
             boss: None,
@@ -97,6 +100,7 @@ impl Logic {
         Generate::power(self);
         Generate::boss(self);
         Generate::xerox(self);
+        Generate::obstacles(self);
     }
 
     pub fn shift(&mut self, level: &i32) -> bool {
@@ -110,6 +114,7 @@ impl Logic {
         Hit::shields(self);
         Hit::follower(self);
         Hit::moving(self, level);
+        Hit::obstacles(self);
         Handle::mind_control(self);
         Hit::player(self)
     }
@@ -162,5 +167,9 @@ impl Logic {
 
     pub fn xerox(&self) -> Option<&Shooter> {
         self.xerox.as_ref()
+    }
+
+    pub fn obstacles(&self) -> &[Shield] {
+        self.obstacles.as_ref()
     }
 }

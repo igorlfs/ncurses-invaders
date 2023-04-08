@@ -28,9 +28,10 @@ fn finalize() {
 }
 
 fn colors() {
-    const TOTAL_COLORS: i16 = 8;
-    init_pair(TOTAL_COLORS, 0, -1);
-    for i in 1..TOTAL_COLORS {
+    const RAINBOW_COLORS: i16 = 7;
+    init_pair(RAINBOW_COLORS, 7, 7);
+    init_pair(RAINBOW_COLORS + 1, 0, -1);
+    for i in 1..RAINBOW_COLORS {
         init_pair(i, i, -1);
     }
 }

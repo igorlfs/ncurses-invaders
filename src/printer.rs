@@ -26,6 +26,7 @@ const COLOR_BULLET: i16 = 4;
 const COLOR_ALLY: i16 = 4;
 const COLOR_POWER: i16 = 5;
 const COLOR_SHIELD: i16 = 6;
+const COLOR_OBSTACLE: i16 = 7;
 const COLOR_BOSS: i16 = 8;
 
 impl Printer {
@@ -120,6 +121,15 @@ impl Printer {
             mvwaddch(win, pos.0, pos.1, '_' as u32);
         }
         wattroff(win, COLOR_PAIR(COLOR_SHIELD));
+    }
+
+    pub fn obstacles(win: WINDOW, obstacles: &[Shield]) {
+        wattron(win, COLOR_PAIR(COLOR_OBSTACLE));
+        for obstacle in obstacles {
+            let pos = obstacle.pos();
+            mvwaddch(win, pos.0, pos.1, ' ' as u32);
+        }
+        wattroff(win, COLOR_PAIR(COLOR_OBSTACLE));
     }
 
     pub fn follower(win: WINDOW, follower: &Shield) {

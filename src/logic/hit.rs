@@ -34,6 +34,26 @@ impl Hit {
         false
     }
 
+    pub fn obstacles(logic: &mut Logic) {
+        if let Some(time) = logic.effects.get(&Effect::Obstacle) {
+            if time.elapsed() > POWER_COOLDOWN {
+                logic.obstacles.clear();
+            } else {
+                for enemy in &logic.enemies {
+                    for obstacle in logic.obstacles.iter_mut() {
+                        if enemy.pos() == obstacle.pos() {
+                            obstacle.damage();
+                        }
+                    }
+                }
+                for obstacle in &logic.obstacles {
+                    logic.enemies.retain(|enemy| enemy.pos() != obstacle.pos());
+                }
+                logic.obstacles.retain(|shield| shield.is_alive());
+            }
+        }
+    }
+
     pub fn powers(logic: &mut Logic) {
         let mut shields = false;
         let mut clear = false;

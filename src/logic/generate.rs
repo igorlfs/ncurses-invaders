@@ -1,6 +1,6 @@
 use super::{
     handle::Handle, Logic, BOSS_PROPABILITY, ENEMIES_PER_ROW, ENEMY_ROWS, FIRE_PROBABILITY,
-    POWER_PROBABILITY, SHIELDS,
+    OBSTACLES, POWER_PROBABILITY, SHIELDS,
 };
 use crate::{
     boss::Boss,
@@ -28,6 +28,18 @@ impl Generate {
             logic
                 .shields
                 .push(Shield::new((logic.height - 3, 3 * i - 1), 3))
+        }
+    }
+
+    pub fn obstacles(logic: &mut Logic) {
+        let obstacle = Handle::power(logic, &Effect::Obstacle);
+        if obstacle && logic.obstacles.is_empty() {
+            for i in 0..OBSTACLES {
+                logic.obstacles.push(Shield::new(
+                    (logic.height - (4 + 2 * i), logic.width / 2),
+                    3,
+                ));
+            }
         }
     }
 
