@@ -82,7 +82,7 @@ impl Invaders {
         let shields = self.gate.shields();
         Printer::shields(self.window, shields);
         let obstacles = self.gate.obstacles();
-        Printer::obstacles(self.window, obstacles);
+        Printer::shields(self.window, obstacles);
         if let Some(xerox) = self.gate.xerox() {
             Printer::player(self.window, xerox);
         }

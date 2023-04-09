@@ -1,11 +1,18 @@
 pub struct Shield {
     pos: (i32, i32),
     lives: i8,
+    color: i16,
+    char: u32,
 }
 
 impl Shield {
-    pub fn new(pos: (i32, i32), lives: i8) -> Self {
-        Self { pos, lives }
+    pub fn new(pos: (i32, i32), lives: i8, color: i16, char: u32) -> Self {
+        Self {
+            pos,
+            lives,
+            color,
+            char,
+        }
     }
 
     pub fn pos(&self) -> (i32, i32) {
@@ -22,5 +29,13 @@ impl Shield {
 
     pub fn is_alive(&self) -> bool {
         self.lives > 0
+    }
+
+    pub fn color(&self) -> i16 {
+        self.color
+    }
+
+    pub fn char(&self) -> u32 {
+        self.char
     }
 }

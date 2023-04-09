@@ -6,6 +6,7 @@ use crate::{
     boss::Boss,
     direction::Direction,
     power::{Effect, PowerUp},
+    printer::{COLOR_OBSTACLE, COLOR_SHIELD},
     shield::Shield,
     shooter::Shooter,
     util,
@@ -25,9 +26,12 @@ impl Generate {
 
     pub fn shields(logic: &mut Logic) {
         for i in 1..SHIELDS {
-            logic
-                .shields
-                .push(Shield::new((logic.height - 3, 3 * i - 1), 3))
+            logic.shields.push(Shield::new(
+                (logic.height - 3, 3 * i - 1),
+                3,
+                COLOR_SHIELD,
+                '_' as u32,
+            ))
         }
     }
 
@@ -38,6 +42,8 @@ impl Generate {
                 logic.obstacles.push(Shield::new(
                     (logic.height - (4 + 2 * i), logic.width / 2),
                     3,
+                    COLOR_OBSTACLE,
+                    ' ' as u32,
                 ));
             }
         }
@@ -60,7 +66,7 @@ impl Generate {
 
     pub fn follower(logic: &mut Logic) {
         let player_x = logic.player().pos().1;
-        logic.follower = Some(Shield::new((logic.height - 3, player_x), 1));
+        logic.follower = Some(Shield::new((logic.height - 3, player_x), 1, 3, '_' as u32));
     }
 
     pub fn boss(logic: &mut Logic) {
