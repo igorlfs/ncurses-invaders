@@ -1,8 +1,9 @@
+use crate::object::Object;
 use crate::{direction::Direction, power::Effect};
 
 use super::{
-    Logic, ATTACK_COOLDOWN, COMBINED_ATTACK_COOLDOWN, DOUBLE_ATTACK_COOLDOWN, POWER_COOLDOWN,
-    TRIPLE_ATTACK_COOLDOWN,
+    Logic, ATTACK_COOLDOWN, CHAR_BULLET, COLOR_BULLET, COMBINED_ATTACK_COOLDOWN,
+    DOUBLE_ATTACK_COOLDOWN, POWER_COOLDOWN, TRIPLE_ATTACK_COOLDOWN,
 };
 
 pub struct Handle;
@@ -27,9 +28,13 @@ impl Handle {
         logic.cooldown_attack = DOUBLE_ATTACK_COOLDOWN;
         let player_pos = logic.player.pos();
         let pos = (player_pos.0 - 1, player_pos.1);
-        logic
-            .player
-            .shoot_pos(&pos, Direction::Up, Handle::power(logic, &Effect::Grenade));
+        logic.player.shoot_pos(
+            &pos,
+            Direction::Up,
+            Handle::power(logic, &Effect::Grenade),
+            CHAR_BULLET,
+            COLOR_BULLET,
+        );
     }
 
     fn triple(logic: &mut Logic) {
@@ -37,18 +42,32 @@ impl Handle {
         let player_pos = logic.player.pos();
         let pos_left = (player_pos.0 - 1, player_pos.1 + 1);
         let grenade = Handle::power(logic, &Effect::Grenade);
-        logic
-            .player
-            .shoot_pos(&pos_left, Direction::LeftUp, grenade);
+        logic.player.shoot_pos(
+            &pos_left,
+            Direction::LeftUp,
+            grenade,
+            CHAR_BULLET,
+            COLOR_BULLET,
+        );
         let pos_right = (player_pos.0 - 1, player_pos.1 - 1);
-        logic
-            .player
-            .shoot_pos(&pos_right, Direction::RightUp, grenade);
+        logic.player.shoot_pos(
+            &pos_right,
+            Direction::RightUp,
+            grenade,
+            CHAR_BULLET,
+            COLOR_BULLET,
+        );
     }
 
     pub fn attack(logic: &mut Logic) {
         if let Some(xerox) = &logic.xerox {
-            logic.player.shoot_pos(&xerox.pos(), Direction::Up, false);
+            logic.player.shoot_pos(
+                &xerox.pos(),
+                Direction::Up,
+                false,
+                CHAR_BULLET,
+                COLOR_BULLET,
+            );
         }
         let double = Handle::power(logic, &Effect::Double);
         let triple = Handle::power(logic, &Effect::Triple);

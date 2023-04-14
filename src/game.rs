@@ -1,4 +1,8 @@
-use crate::{direction::Direction, logic::Logic, printer::Printer};
+use crate::{
+    direction::Direction,
+    logic::{Logic, COLOR_OBSTACLES, COLOR_POWERS, COLOR_SHIELDS},
+    printer::Printer,
+};
 use ncurses::{box_, keypad, leaveok, wgetch, KEY_LEFT, KEY_RIGHT, WINDOW};
 use std::time::{Duration, Instant};
 
@@ -74,23 +78,23 @@ impl Invaders {
         Printer::clear(self.window);
         Printer::header(self.score, self.window, self.ships);
         let enemies = self.gate.enemies();
-        Printer::enemies(self.window, enemies);
-        let powers = self.gate.powers();
-        Printer::powers(self.window, powers);
+        Printer::shooters(self.window, enemies);
         let player = self.gate.player();
-        Printer::player(self.window, player);
+        Printer::shooter(self.window, player);
+        let powers = self.gate.powers();
+        Printer::objects(self.window, powers, COLOR_POWERS);
         let shields = self.gate.shields();
-        Printer::shields(self.window, shields);
+        Printer::objects(self.window, shields, COLOR_SHIELDS);
         let obstacles = self.gate.obstacles();
-        Printer::shields(self.window, obstacles);
+        Printer::objects(self.window, obstacles, COLOR_OBSTACLES);
         if let Some(xerox) = self.gate.xerox() {
-            Printer::player(self.window, xerox);
+            Printer::shooter(self.window, xerox);
         }
         if let Some(follower) = self.gate.follower() {
-            Printer::follower(self.window, follower);
+            Printer::object(self.window, follower);
         }
         if let Some(boss) = self.gate.boss() {
-            Printer::boss(self.window, boss);
+            Printer::object(self.window, boss);
         }
         Printer::footer(self.gate.active_effects());
     }

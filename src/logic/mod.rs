@@ -32,6 +32,24 @@ const FIRE_PROBABILITY: f32 = 0.05;
 const BOSS_PROPABILITY: f32 = 0.001;
 const SHIELDS: i32 = 14;
 const OBSTACLES: i32 = 4;
+const CHAR_PLAYER: u32 = '*' as u32;
+const CHAR_ENEMY: u32 = 'v' as u32;
+const CHAR_LASER: u32 = ':' as u32;
+const CHAR_BULLET: u32 = '.' as u32;
+const CHAR_OBSTACLE: u32 = ' ' as u32;
+const CHAR_SHIELD: u32 = '_' as u32;
+const CHAR_FOLLOWER: u32 = CHAR_SHIELD;
+pub const CHAR_BOSS: u32 = 'V' as u32;
+const COLOR_LASER: i16 = 1;
+const COLOR_ENEMY: i16 = 2;
+const COLOR_PLAYER: i16 = 3;
+const COLOR_FOLLOWER: i16 = COLOR_PLAYER;
+const COLOR_BULLET: i16 = 4;
+const COLOR_ALLY: i16 = COLOR_BULLET;
+pub const COLOR_POWERS: i16 = 5;
+pub const COLOR_SHIELDS: i16 = 6;
+pub const COLOR_OBSTACLES: i16 = 7;
+pub const COLOR_BOSS: i16 = 8;
 
 pub struct Logic {
     enemies: Vec<Shooter>,
@@ -62,7 +80,7 @@ impl Logic {
             effects: HashMap::new(),
             shields: vec![],
             obstacles: vec![],
-            player: Shooter::new((y - 2, x / 2)),
+            player: Shooter::new((y - 2, x / 2), CHAR_PLAYER, COLOR_PLAYER),
             follower: None,
             boss: None,
             xerox: None,
@@ -83,8 +101,12 @@ impl Logic {
 
     pub fn player_shoot(&mut self) {
         if self.last_attack.elapsed() >= self.cooldown_attack {
-            self.player
-                .shoot(Direction::Up, Handle::power(self, &Effect::Grenade));
+            self.player.shoot(
+                Direction::Up,
+                Handle::power(self, &Effect::Grenade),
+                CHAR_BULLET,
+                COLOR_BULLET,
+            );
             Handle::attack(self);
             self.last_attack = Instant::now();
         }

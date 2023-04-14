@@ -1,4 +1,5 @@
 use super::{handle::Handle, Logic};
+use crate::object::Object;
 use crate::{direction::Direction, power::Effect, shooter::Shooter, util};
 
 pub struct Move;

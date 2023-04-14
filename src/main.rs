@@ -3,6 +3,7 @@ mod bullet;
 mod direction;
 mod game;
 mod logic;
+mod object;
 mod power;
 mod printer;
 mod shield;

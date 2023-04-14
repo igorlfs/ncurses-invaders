@@ -1,8 +1,22 @@
+use crate::object::Object;
+
 pub struct Shield {
     pos: (i32, i32),
     lives: i8,
     color: i16,
     char: u32,
+}
+
+impl Object for Shield {
+    fn pos(&self) -> (i32, i32) {
+        self.pos
+    }
+    fn char(&self) -> u32 {
+        self.char
+    }
+    fn color(&self) -> i16 {
+        self.color
+    }
 }
 
 impl Shield {
@@ -15,10 +29,6 @@ impl Shield {
         }
     }
 
-    pub fn pos(&self) -> (i32, i32) {
-        self.pos
-    }
-
     pub fn damage(&mut self) {
         self.lives -= 1;
     }
@@ -29,13 +39,5 @@ impl Shield {
 
     pub fn is_alive(&self) -> bool {
         self.lives > 0
-    }
-
-    pub fn color(&self) -> i16 {
-        self.color
-    }
-
-    pub fn char(&self) -> u32 {
-        self.char
     }
 }

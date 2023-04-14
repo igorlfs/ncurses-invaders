@@ -1,23 +1,35 @@
-use crate::{direction::Direction, util};
+use crate::{direction::Direction, object::Object, util};
 
 #[derive(Clone, PartialEq)]
 pub struct Bullet {
     pos: (i32, i32),
+    char: u32,
+    color: i16,
     dir: Direction,
     is_explosive: bool,
 }
 
+impl Object for Bullet {
+    fn pos(&self) -> (i32, i32) {
+        self.pos
+    }
+    fn char(&self) -> u32 {
+        self.char
+    }
+    fn color(&self) -> i16 {
+        self.color
+    }
+}
+
 impl Bullet {
-    pub fn new(pos: (i32, i32), dir: Direction, is_explosive: bool) -> Self {
+    pub fn new(pos: (i32, i32), dir: Direction, char: u32, color: i16) -> Self {
         Self {
             pos,
             dir,
-            is_explosive,
+            char,
+            color,
+            is_explosive: false,
         }
-    }
-
-    pub fn pos(&self) -> (i32, i32) {
-        self.pos
     }
 
     pub fn shift(&mut self) {
@@ -34,5 +46,9 @@ impl Bullet {
 
     pub fn is_explosive(&self) -> bool {
         self.is_explosive
+    }
+
+    pub fn set_is_explosive(&mut self, is_explosive: bool) {
+        self.is_explosive = is_explosive;
     }
 }

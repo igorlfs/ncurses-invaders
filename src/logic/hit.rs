@@ -1,8 +1,10 @@
-use std::time::{Duration, Instant};
-
+use super::{
+    generate::Generate, handle::Handle, Logic, BOSS_SCORE, CHAR_LASER, COLOR_LASER, ENEMY_SCORE,
+    POWER_COOLDOWN,
+};
+use crate::object::Object;
 use crate::{bullet::Bullet, power::Effect};
-
-use super::{generate::Generate, handle::Handle, Logic, BOSS_SCORE, ENEMY_SCORE, POWER_COOLDOWN};
+use std::time::{Duration, Instant};
 
 pub struct Hit;
 
@@ -149,8 +151,7 @@ impl Hit {
     pub fn boss(logic: &mut Logic) -> bool {
         if let Some(boss) = logic.boss {
             for bullet in logic.player.bullets() {
-                if bullet.pos() == (2, boss.left_pos()) || bullet.pos() == (2, boss.left_pos() + 1)
-                {
+                if bullet.pos() == boss.pos() {
                     logic.boss = None;
                     return true;
                 }
@@ -191,7 +192,13 @@ impl Hit {
 
         for bullet in exploding_bullets {
             if bullet.is_explosive() {
-                logic.player.shoot_pos(&bullet.pos(), rand::random(), false);
+                logic.player.shoot_pos(
+                    &bullet.pos(),
+                    rand::random(),
+                    false,
+                    CHAR_LASER,
+                    COLOR_LASER,
+                );
             }
         }
 

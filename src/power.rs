@@ -1,3 +1,4 @@
+use crate::{logic::COLOR_POWERS, object::Object};
 use rand::{
     distributions::{Distribution, Standard},
     Rng,
@@ -66,6 +67,19 @@ pub struct PowerUp {
     pos: (i32, i32),
     effect: Effect,
     char: u32,
+    color: i16,
+}
+
+impl Object for PowerUp {
+    fn pos(&self) -> (i32, i32) {
+        self.pos
+    }
+    fn char(&self) -> u32 {
+        self.char
+    }
+    fn color(&self) -> i16 {
+        self.color
+    }
 }
 
 impl PowerUp {
@@ -74,21 +88,18 @@ impl PowerUp {
         match first_char {
             Some(char) => {
                 let char = char as u32;
-                Self { pos, effect, char }
+                Self {
+                    pos,
+                    effect,
+                    char,
+                    color: COLOR_POWERS,
+                }
             }
             None => panic!("Woopsie. Effect {effect} contains no characters. How did this happen?"),
         }
     }
 
-    pub fn pos(&self) -> (i32, i32) {
-        self.pos
-    }
-
     pub fn effect(&self) -> &Effect {
         &self.effect
-    }
-
-    pub fn char(&self) -> u32 {
-        self.char
     }
 }

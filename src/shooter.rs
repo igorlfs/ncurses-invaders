@@ -1,25 +1,36 @@
+use crate::{bullet::Bullet, direction::Direction, object::Object, util};
 use std::collections::VecDeque;
-
-use crate::{bullet::Bullet, direction::Direction, util};
 
 #[derive(Clone)]
 pub struct Shooter {
     pos: (i32, i32),
+    char: u32,
+    color: i16,
     bullets: VecDeque<Bullet>,
     is_mind_controlled: bool,
 }
 
+impl Object for Shooter {
+    fn pos(&self) -> (i32, i32) {
+        self.pos
+    }
+    fn char(&self) -> u32 {
+        self.char
+    }
+    fn color(&self) -> i16 {
+        self.color
+    }
+}
+
 impl Shooter {
-    pub fn new(pos: (i32, i32)) -> Self {
+    pub fn new(pos: (i32, i32), char: u32, color: i16) -> Self {
         Self {
             pos,
+            char,
+            color,
             bullets: VecDeque::new(),
             is_mind_controlled: false,
         }
-    }
-
-    pub fn pos(&self) -> (i32, i32) {
-        self.pos
     }
 
     pub fn new_pos(&self, dir: &Direction) -> (i32, i32) {
@@ -46,13 +57,32 @@ impl Shooter {
             .retain(|bullet| !util::out_of_bounds(bullet.pos()))
     }
 
-    pub fn shoot(&mut self, dir: Direction, is_explosive: bool) {
+    pub fn shoot(&mut self, dir: Direction, is_explosive: bool, char: u32, color: i16) {
         let pos = self.pos();
-        self.bullets.push_back(Bullet::new(pos, dir, is_explosive));
+        self.bullets.push_back(Bullet::new(pos, dir, char, color));
+        self.handle_explosive(&is_explosive);
     }
 
-    pub fn shoot_pos(&mut self, pos: &(i32, i32), dir: Direction, is_explosive: bool) {
-        self.bullets.push_back(Bullet::new(*pos, dir, is_explosive));
+    pub fn shoot_pos(
+        &mut self,
+        pos: &(i32, i32),
+        dir: Direction,
+        is_explosive: bool,
+        char: u32,
+        color: i16,
+    ) {
+        self.bullets.push_back(Bullet::new(*pos, dir, char, color));
+        self.handle_explosive(&is_explosive);
+    }
+
+    fn handle_explosive(&mut self, is_explosive: &bool) {
+        if *is_explosive {
+            self.bullets
+                .iter_mut()
+                .last()
+                .expect("Handle explosives has been called without any explosive")
+                .set_is_explosive(true);
+        }
     }
 
     pub fn is_mind_controlled(&self) -> bool {
