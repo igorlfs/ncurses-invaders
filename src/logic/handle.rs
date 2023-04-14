@@ -59,15 +59,25 @@ impl Handle {
         );
     }
 
+    pub fn jump(logic: &mut Logic) {
+        let player_pos = logic.player.pos();
+        if Handle::power(logic, &Effect::Jump) {
+            logic.player.set_pos((3, player_pos.1));
+        } else {
+            logic.player.set_pos((logic.height - 2, player_pos.1));
+        }
+    }
+
     pub fn attack(logic: &mut Logic) {
         if let Some(xerox) = &logic.xerox {
-            logic.player.shoot_pos(
-                &xerox.pos(),
-                Direction::Up,
-                false,
-                CHAR_BULLET,
-                COLOR_BULLET,
-            );
+            let dir = if Handle::power(logic, &Effect::Jump) {
+                Direction::Down
+            } else {
+                Direction::Up
+            };
+            logic
+                .player
+                .shoot_pos(&xerox.pos(), dir, false, CHAR_BULLET, COLOR_BULLET);
         }
         let double = Handle::power(logic, &Effect::Double);
         let triple = Handle::power(logic, &Effect::Triple);

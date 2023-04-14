@@ -20,5 +20,7 @@ pub fn shift(pos: &(i32, i32), dir: &Direction) -> (i32, i32) {
         Direction::LeftUp => (pos.0 - 1, pos.1 - 1),
         Direction::RightUp => (pos.0 - 1, pos.1 + 1),
         Direction::Down => (pos.0 + 1, pos.1),
+        Direction::LeftDown => (pos.0 + 1, pos.1 - 1),
+        Direction::RightDown => (pos.0 + 1, pos.1 + 1),
     }
 }

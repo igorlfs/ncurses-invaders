@@ -8,6 +8,7 @@ pub struct Shooter {
     color: i16,
     bullets: VecDeque<Bullet>,
     is_mind_controlled: bool,
+    revert: bool,
 }
 
 impl Object for Shooter {
@@ -30,6 +31,7 @@ impl Shooter {
             color,
             bullets: VecDeque::new(),
             is_mind_controlled: false,
+            revert: false,
         }
     }
 
@@ -57,8 +59,11 @@ impl Shooter {
             .retain(|bullet| !util::out_of_bounds(bullet.pos()))
     }
 
-    pub fn shoot(&mut self, dir: Direction, is_explosive: bool, char: u32, color: i16) {
+    pub fn shoot(&mut self, mut dir: Direction, is_explosive: bool, char: u32, color: i16) {
         let pos = self.pos();
+        if self.revert {
+            dir = self.revert(&dir);
+        }
         self.bullets.push_back(Bullet::new(pos, dir, char, color));
         self.handle_explosive(&is_explosive);
     }
@@ -66,11 +71,14 @@ impl Shooter {
     pub fn shoot_pos(
         &mut self,
         pos: &(i32, i32),
-        dir: Direction,
+        mut dir: Direction,
         is_explosive: bool,
         char: u32,
         color: i16,
     ) {
+        if self.revert {
+            dir = self.revert(&dir);
+        }
         self.bullets.push_back(Bullet::new(*pos, dir, char, color));
         self.handle_explosive(&is_explosive);
     }
@@ -99,5 +107,22 @@ impl Shooter {
 
     pub fn set_y(&mut self, y: i32) {
         self.pos.1 = y;
+    }
+
+    pub fn revert(&mut self, dir: &Direction) -> Direction {
+        match *dir {
+            Direction::Up => Direction::Down,
+            Direction::Left => Direction::Right,
+            Direction::Right => Direction::Left,
+            Direction::Down => Direction::Up,
+            Direction::LeftDown => Direction::RightUp,
+            Direction::LeftUp => Direction::RightDown,
+            Direction::RightDown => Direction::LeftUp,
+            Direction::RightUp => Direction::LeftDown,
+        }
+    }
+
+    pub fn set_revert(&mut self, revert: bool) {
+        self.revert = revert;
     }
 }

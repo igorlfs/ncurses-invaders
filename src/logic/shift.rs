@@ -70,6 +70,7 @@ impl Move {
             if util::out_of_bounds(bullet.pos()) && reflect {
                 let new_dir = match bullet.dir() {
                     Direction::Up => Direction::Down,
+                    Direction::Down => Direction::Up,
                     Direction::LeftUp => Direction::RightUp,
                     Direction::RightUp => Direction::LeftUp,
                     _ => Direction::Up,

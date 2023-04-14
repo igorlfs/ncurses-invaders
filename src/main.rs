@@ -37,7 +37,7 @@ fn colors() {
     }
 }
 
-pub const LINES: i32 = 20;
+pub const LINES: i32 = 24;
 pub const COLS: i32 = 40;
 
 fn main() {

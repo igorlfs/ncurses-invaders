@@ -25,7 +25,7 @@ impl Generate {
         for j in 0..ENEMY_ROWS {
             for i in 0..ENEMIES_PER_ROW {
                 logic.enemies.push(Shooter::new(
-                    (2 * (j + 1), 2 * i + 1),
+                    (2 * (j + 2), 2 * i + 1),
                     CHAR_ENEMY,
                     COLOR_ENEMY,
                 ));

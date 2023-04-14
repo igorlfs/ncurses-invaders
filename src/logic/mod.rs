@@ -100,6 +100,7 @@ impl Logic {
     }
 
     pub fn player_shoot(&mut self) {
+        self.player.set_revert(Handle::power(self, &Effect::Jump));
         if self.last_attack.elapsed() >= self.cooldown_attack {
             self.player.shoot(
                 Direction::Up,
@@ -126,6 +127,7 @@ impl Logic {
     }
 
     pub fn shift(&mut self, level: &i32) -> bool {
+        Handle::jump(self);
         Move::bullets(self);
         Hit::moving(self, level);
         Move::foes(self)
