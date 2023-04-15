@@ -35,7 +35,7 @@ impl Printer {
 
     pub fn footer(effects: Vec<Effect>) {
         const MAX_STR_SIZE: i32 = COLS - 15;
-        let window = window::get_mid_window(3, COLS, LINES + 3);
+        let window = window::get_mid_window(3, COLS, LINES + 13);
         box_(window, 0, 0);
         let mut effects_string = String::new();
         for effect in effects {

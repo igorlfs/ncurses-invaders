@@ -214,7 +214,7 @@ impl Hit {
         }
     }
 
-    pub fn moving(logic: &mut Logic, level: &i32) {
+    pub fn targets(logic: &mut Logic, level: &i32) {
         if Handle::power(logic, &Effect::Block) {
             Hit::lasers(logic);
         }

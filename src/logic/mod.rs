@@ -137,19 +137,25 @@ impl Logic {
     }
 
     pub fn shift(&mut self, level: &i32) -> bool {
-        Handle::jump(self);
         Move::bullets(self);
-        Hit::moving(self, level);
+        // When both bullets and targets move, they might collide
+        // But such collision is skipped if we don't check after
+        // the bullets' movements
+        Hit::targets(self, level);
         Move::foes(self)
+    }
+
+    pub fn handle(&mut self) {
+        Handle::jump(self);
+        Handle::mind_control(self);
     }
 
     pub fn hit(&mut self, level: &i32) -> bool {
         Hit::powers(self);
         Hit::shields(self);
         Hit::follower(self);
-        Hit::moving(self, level);
+        Hit::targets(self, level);
         Hit::obstacles(self);
-        Handle::mind_control(self);
         Hit::player(self)
     }
 
