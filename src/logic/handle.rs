@@ -25,38 +25,42 @@ impl Handle {
     }
 
     fn double(logic: &mut Logic) {
-        logic.cooldown_attack = DOUBLE_ATTACK_COOLDOWN;
-        let player_pos = logic.player.pos();
-        let pos = (player_pos.0 - 1, player_pos.1);
-        logic.player.shoot_pos(
-            &pos,
-            Direction::Up,
-            Handle::power(logic, &Effect::Grenade),
-            CHAR_BULLET,
-            COLOR_BULLET,
-        );
+        if !Handle::power(logic, &Effect::Double) {
+            logic.cooldown_attack = DOUBLE_ATTACK_COOLDOWN;
+            let player_pos = logic.player.pos();
+            let pos = (player_pos.0 - 1, player_pos.1);
+            logic.player.shoot_pos(
+                &pos,
+                Direction::Up,
+                Handle::power(logic, &Effect::Grenade),
+                CHAR_BULLET,
+                COLOR_BULLET,
+            );
+        }
     }
 
     fn triple(logic: &mut Logic) {
-        logic.cooldown_attack = TRIPLE_ATTACK_COOLDOWN;
-        let player_pos = logic.player.pos();
-        let pos_left = (player_pos.0 - 1, player_pos.1 + 1);
-        let grenade = Handle::power(logic, &Effect::Grenade);
-        logic.player.shoot_pos(
-            &pos_left,
-            Direction::LeftUp,
-            grenade,
-            CHAR_BULLET,
-            COLOR_BULLET,
-        );
-        let pos_right = (player_pos.0 - 1, player_pos.1 - 1);
-        logic.player.shoot_pos(
-            &pos_right,
-            Direction::RightUp,
-            grenade,
-            CHAR_BULLET,
-            COLOR_BULLET,
-        );
+        if !Handle::power(logic, &Effect::Triple) {
+            logic.cooldown_attack = TRIPLE_ATTACK_COOLDOWN;
+            let player_pos = logic.player.pos();
+            let pos_left = (player_pos.0 - 1, player_pos.1 + 1);
+            let grenade = Handle::power(logic, &Effect::Grenade);
+            logic.player.shoot_pos(
+                &pos_left,
+                Direction::LeftUp,
+                grenade,
+                CHAR_BULLET,
+                COLOR_BULLET,
+            );
+            let pos_right = (player_pos.0 - 1, player_pos.1 - 1);
+            logic.player.shoot_pos(
+                &pos_right,
+                Direction::RightUp,
+                grenade,
+                CHAR_BULLET,
+                COLOR_BULLET,
+            );
+        }
     }
 
     pub fn jump(logic: &mut Logic) {
@@ -81,16 +85,11 @@ impl Handle {
         }
         let double = Handle::power(logic, &Effect::Double);
         let triple = Handle::power(logic, &Effect::Triple);
-        if double {
-            Handle::double(logic);
-        }
-        if triple {
-            Handle::triple(logic);
-        }
+        Handle::double(logic);
+        Handle::triple(logic);
         if double && triple {
             logic.cooldown_attack = COMBINED_ATTACK_COOLDOWN;
-        }
-        if !double && !triple && !Handle::power(logic, &Effect::Quickshot) {
+        } else {
             logic.cooldown_attack = ATTACK_COOLDOWN;
         }
     }

@@ -57,33 +57,21 @@ impl Hit {
     }
 
     pub fn powers(logic: &mut Logic) {
-        let mut clear = false;
-        let mut quick = false;
         for bullet in logic.player.bullets() {
             logic.powers.retain(|power| {
                 if power.pos() != bullet.pos() {
                     true
                 } else {
-                    let effect = *power.effect();
-                    if effect == Effect::Clear {
-                        clear = true;
-                    } else {
-                        if effect == Effect::Quickshot {
-                            quick = true;
+                    if *power.effect() == Effect::Clear {
+                        for enemy in logic.enemies.iter_mut() {
+                            enemy.bullets_mut().clear();
                         }
+                    } else {
                         logic.effects.insert(*power.effect(), Instant::now());
                     }
                     false
                 }
             });
-        }
-        if Handle::power(logic, &Effect::Quickshot) && quick {
-            logic.cooldown_attack /= 2;
-        }
-        if clear {
-            for enemy in logic.enemies.iter_mut() {
-                enemy.bullets_mut().clear();
-            }
         }
     }
 

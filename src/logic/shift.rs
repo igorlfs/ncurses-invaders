@@ -25,7 +25,9 @@ impl Move {
         } else {
             logic.player.shift(direction);
         }
+    }
 
+    pub fn xerox(logic: &mut Logic) {
         if let Some(xerox) = &mut logic.xerox {
             let player_pos = logic.player.pos();
             let y = logic.width - player_pos.1;
