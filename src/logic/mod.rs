@@ -40,6 +40,7 @@ const CHAR_OBSTACLE: u32 = ' ' as u32;
 const CHAR_SHIELD: u32 = '_' as u32;
 const CHAR_FOLLOWER: u32 = CHAR_SHIELD;
 pub const CHAR_BOSS: u32 = 'V' as u32;
+const CHAR_ULTRA: u32 = ' ' as u32;
 const COLOR_LASER: i16 = 1;
 const COLOR_ENEMY: i16 = 2;
 const COLOR_PLAYER: i16 = 3;
@@ -50,6 +51,7 @@ pub const COLOR_POWERS: i16 = 5;
 pub const COLOR_SHIELDS: i16 = 6;
 pub const COLOR_OBSTACLES: i16 = 7;
 pub const COLOR_BOSS: i16 = 8;
+const COLOR_ULTRA: i16 = 9;
 
 pub struct Logic {
     enemies: Vec<Shooter>,

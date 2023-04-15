@@ -32,6 +32,7 @@ fn colors() {
     const RAINBOW_COLORS: i16 = 7;
     init_pair(RAINBOW_COLORS, 7, 7);
     init_pair(RAINBOW_COLORS + 1, 0, -1);
+    init_pair(RAINBOW_COLORS + 2, 4, 4);
     for i in 1..RAINBOW_COLORS {
         init_pair(i, i, -1);
     }

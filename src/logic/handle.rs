@@ -2,8 +2,8 @@ use crate::object::Object;
 use crate::{direction::Direction, power::Effect};
 
 use super::{
-    Logic, ATTACK_COOLDOWN, CHAR_BULLET, COLOR_BULLET, COMBINED_ATTACK_COOLDOWN,
-    DOUBLE_ATTACK_COOLDOWN, POWER_COOLDOWN, TRIPLE_ATTACK_COOLDOWN,
+    Logic, ATTACK_COOLDOWN, CHAR_BULLET, CHAR_ULTRA, COLOR_BULLET, COLOR_ULTRA,
+    COMBINED_ATTACK_COOLDOWN, DOUBLE_ATTACK_COOLDOWN, POWER_COOLDOWN, TRIPLE_ATTACK_COOLDOWN,
 };
 
 pub struct Handle;
@@ -69,6 +69,26 @@ impl Handle {
             logic.player.set_pos((3, player_pos.1));
         } else {
             logic.player.set_pos((logic.height - 2, player_pos.1));
+        }
+    }
+
+    pub fn ultra(logic: &mut Logic) {
+        let player_pos = logic.player.pos();
+        // When jumping, direction is reversed so we don't need to worry about changing direction,
+        // only the range
+        let range = if Handle::power(logic, &Effect::Jump) {
+            player_pos.0 + 1..logic.height - 1
+        } else {
+            3..player_pos.0
+        };
+        for i in range {
+            logic.player.shoot_pos(
+                &(i, player_pos.1),
+                Direction::Up,
+                false,
+                CHAR_ULTRA,
+                COLOR_ULTRA,
+            );
         }
     }
 
