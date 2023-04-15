@@ -6,11 +6,11 @@ use crate::{
 use ncurses::{box_, keypad, leaveok, wgetch, KEY_LEFT, KEY_RIGHT, WINDOW};
 use std::time::{Duration, Instant};
 
-const MAX_SHIPS: i8 = 3;
-const UPDATE_COOLDOWN: Duration = Duration::from_millis(50);
+const MAX_PLAYER_LIVES: i8 = 3;
+const REFRESH_RATE: Duration = Duration::from_millis(50);
 
 pub struct Invaders {
-    ships: i8,
+    lives: i8,
     level: i32,
     input: i32,
     score: i32,
@@ -22,7 +22,7 @@ pub struct Invaders {
 impl Invaders {
     pub fn new(win: WINDOW) -> Self {
         Self {
-            ships: MAX_SHIPS,
+            lives: MAX_PLAYER_LIVES,
             level: 0,
             input: 0,
             score: 0,
@@ -45,8 +45,8 @@ impl Invaders {
     fn update(&mut self) {
         if self.gate.enemies().is_empty() {
             self.gate.level_up(&mut self.level);
-            if self.ships < MAX_SHIPS {
-                self.ships += 1;
+            if self.lives < MAX_PLAYER_LIVES {
+                self.lives += 1;
             }
         }
 
@@ -57,16 +57,16 @@ impl Invaders {
         } else if self.input == KEY_LEFT {
             self.gate.player_move(&Direction::Left);
         } else if self.input == 'q' as i32 {
-            self.ships = -1;
+            self.lives = -1;
         }
 
-        if self.last_update.elapsed() >= UPDATE_COOLDOWN {
+        if self.last_update.elapsed() >= REFRESH_RATE {
             self.gate.generate();
             if self.gate.shift(&self.level) {
-                self.ships = -1;
+                self.lives = -1;
             }
             if self.gate.hit(&self.level) {
-                self.ships -= 1;
+                self.lives -= 1;
             }
             self.score += self.gate.score_increment();
             self.gate.score_reset();
@@ -76,7 +76,7 @@ impl Invaders {
 
     fn print(&self) {
         Printer::clear(self.window);
-        Printer::header(self.score, self.window, self.ships);
+        Printer::header(self.score, self.window, self.lives);
         let enemies = self.gate.enemies();
         Printer::shooters(self.window, enemies);
         let player = self.gate.player();
@@ -99,8 +99,8 @@ impl Invaders {
         Printer::footer(self.gate.active_effects());
     }
 
-    fn is_over(&self) -> bool {
-        self.ships <= -1
+    fn is_game_over(&self) -> bool {
+        self.lives <= -1
     }
 
     fn quit(&self) {
@@ -108,10 +108,7 @@ impl Invaders {
     }
 
     pub fn game_loop(&mut self) {
-        loop {
-            if self.is_over() {
-                break;
-            }
+        while !self.is_game_over() {
             self.update();
             self.print();
             self.read_input();
