@@ -34,13 +34,16 @@ impl Generate {
     }
 
     pub fn shields(logic: &mut Logic) {
-        for i in 1..SHIELDS {
-            logic.shields.push(Shield::new(
-                (logic.height - 3, 3 * i - 1),
-                3,
-                COLOR_SHIELDS,
-                CHAR_SHIELD,
-            ))
+        let shield = Handle::power(logic, &Effect::Shield);
+        if shield && logic.shields.is_empty() {
+            for i in 0..SHIELDS {
+                logic.shields.push(Shield::new(
+                    (logic.height - 3, 3 * i + 1),
+                    3,
+                    COLOR_SHIELDS,
+                    CHAR_SHIELD,
+                ))
+            }
         }
     }
 
@@ -69,18 +72,24 @@ impl Generate {
             }
         }
         if !xerox {
-            logic.xerox = None
+            logic.xerox = None;
         }
     }
 
     pub fn follower(logic: &mut Logic) {
-        let player_x = logic.player().pos().1;
-        logic.follower = Some(Shield::new(
-            (logic.height - 3, player_x),
-            1,
-            COLOR_FOLLOWER,
-            CHAR_FOLLOWER,
-        ));
+        let follower = Handle::power(logic, &Effect::Follower);
+        if Handle::power(logic, &Effect::Follower) && logic.follower.is_none() {
+            let player_x = logic.player().pos().1;
+            logic.follower = Some(Shield::new(
+                (logic.height - 3, player_x),
+                1,
+                COLOR_FOLLOWER,
+                CHAR_FOLLOWER,
+            ));
+        }
+        if !follower {
+            logic.follower = None;
+        }
     }
 
     pub fn boss(logic: &mut Logic) {

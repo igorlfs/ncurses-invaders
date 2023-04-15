@@ -30,7 +30,7 @@ const COMBINED_ATTACK_COOLDOWN: Duration = Duration::from_millis(2000);
 const POWER_PROBABILITY: f32 = 0.08;
 const FIRE_PROBABILITY: f32 = 0.05;
 const BOSS_PROPABILITY: f32 = 0.001;
-const SHIELDS: i32 = 14;
+const SHIELDS: i32 = 13;
 const OBSTACLES: i32 = 4;
 const CHAR_PLAYER: u32 = '*' as u32;
 const CHAR_ENEMY: u32 = 'v' as u32;
@@ -124,6 +124,8 @@ impl Logic {
         Generate::boss(self);
         Generate::xerox(self);
         Generate::obstacles(self);
+        Generate::shields(self);
+        Generate::follower(self);
     }
 
     pub fn shift(&mut self, level: &i32) -> bool {

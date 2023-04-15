@@ -57,10 +57,8 @@ impl Hit {
     }
 
     pub fn powers(logic: &mut Logic) {
-        let mut shields = false;
         let mut clear = false;
         let mut quick = false;
-        let mut follower = false;
         for bullet in logic.player.bullets() {
             logic.powers.retain(|power| {
                 if power.pos() != bullet.pos() {
@@ -70,24 +68,14 @@ impl Hit {
                     if effect == Effect::Clear {
                         clear = true;
                     } else {
-                        if effect == Effect::Shield {
-                            shields = true;
-                        } else if effect == Effect::Quickshot {
+                        if effect == Effect::Quickshot {
                             quick = true;
-                        } else if effect == Effect::Follower {
-                            follower = true;
                         }
                         logic.effects.insert(*power.effect(), Instant::now());
                     }
                     false
                 }
             });
-        }
-        if Handle::power(logic, &Effect::Shield) && shields {
-            Generate::shields(logic);
-        }
-        if Handle::power(logic, &Effect::Follower) && follower {
-            Generate::follower(logic);
         }
         if Handle::power(logic, &Effect::Quickshot) && quick {
             logic.cooldown_attack /= 2;

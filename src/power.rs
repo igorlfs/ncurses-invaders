@@ -8,8 +8,8 @@ use std::fmt;
 #[derive(Clone, Copy, Eq, Hash, PartialEq, Debug)]
 pub enum Effect {
     Antigravity,
-    Clear,
     Block,
+    Clear,
     Double,
     Follower,
     Grenade,
