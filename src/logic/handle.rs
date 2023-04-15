@@ -25,7 +25,7 @@ impl Handle {
     }
 
     fn double(logic: &mut Logic) {
-        if !Handle::power(logic, &Effect::Double) {
+        if Handle::power(logic, &Effect::Double) {
             logic.cooldown_attack = DOUBLE_ATTACK_COOLDOWN;
             let player_pos = logic.player.pos();
             let pos = (player_pos.0 - 1, player_pos.1);
@@ -40,7 +40,7 @@ impl Handle {
     }
 
     fn triple(logic: &mut Logic) {
-        if !Handle::power(logic, &Effect::Triple) {
+        if Handle::power(logic, &Effect::Triple) {
             logic.cooldown_attack = TRIPLE_ATTACK_COOLDOWN;
             let player_pos = logic.player.pos();
             let pos_left = (player_pos.0 - 1, player_pos.1 + 1);
@@ -103,13 +103,14 @@ impl Handle {
                 .player
                 .shoot_pos(&xerox.pos(), dir, false, CHAR_BULLET, COLOR_BULLET);
         }
-        let double = Handle::power(logic, &Effect::Double);
-        let triple = Handle::power(logic, &Effect::Triple);
         Handle::double(logic);
         Handle::triple(logic);
+        let double = Handle::power(logic, &Effect::Double);
+        let triple = Handle::power(logic, &Effect::Triple);
         if double && triple {
             logic.cooldown_attack = COMBINED_ATTACK_COOLDOWN;
-        } else {
+        }
+        if !double && !triple {
             logic.cooldown_attack = ATTACK_COOLDOWN;
         }
     }
