@@ -1,4 +1,4 @@
-use crate::{bullet::Bullet, direction::Direction, object::Object, util};
+use crate::{bullet::Bullet, direction::Direction, logic::COLOR_LASER, object::Object, util};
 use std::collections::VecDeque;
 
 #[derive(Clone)]
@@ -8,6 +8,7 @@ pub struct Shooter {
     color: i16,
     bullets: VecDeque<Bullet>,
     is_mind_controlled: bool,
+    is_numb: bool,
     revert: bool,
 }
 
@@ -31,6 +32,7 @@ impl Shooter {
             color,
             bullets: VecDeque::new(),
             is_mind_controlled: false,
+            is_numb: false,
             revert: false,
         }
     }
@@ -124,5 +126,14 @@ impl Shooter {
 
     pub fn set_revert(&mut self, revert: bool) {
         self.revert = revert;
+    }
+
+    pub fn is_numb(&self) -> bool {
+        self.is_numb
+    }
+
+    pub fn set_numb(&mut self) {
+        self.is_numb = true;
+        self.color = COLOR_LASER;
     }
 }

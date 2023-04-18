@@ -102,7 +102,9 @@ impl Move {
 
             if !(logic.dir == Direction::Down) || !Handle::power(logic, &Effect::Antigravity) {
                 for enemy in logic.enemies.iter_mut() {
-                    enemy.shift(&logic.dir);
+                    if !enemy.is_numb() {
+                        enemy.shift(&logic.dir);
+                    }
                 }
             }
         }

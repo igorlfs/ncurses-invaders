@@ -1,6 +1,5 @@
 use super::{
-    generate::Generate, handle::Handle, Logic, BOSS_SCORE, CHAR_LASER, COLOR_LASER, ENEMY_SCORE,
-    POWER_COOLDOWN,
+    handle::Handle, Logic, BOSS_SCORE, CHAR_LASER, COLOR_LASER, ENEMY_SCORE, POWER_COOLDOWN,
 };
 use crate::object::Object;
 use crate::{bullet::Bullet, power::Effect};
@@ -151,21 +150,38 @@ impl Hit {
         let previous_size = logic.enemies.len();
         let enemies_copy = logic.enemies.to_vec();
         let mind_control = Handle::power(logic, &Effect::Mindcontrol);
+        let numb = Handle::power(logic, &Effect::Numb);
         let player_bullets_copy = logic.player.bullets().clone();
         let mut exploding_bullets: Vec<Bullet> = vec![];
         for bullet in player_bullets_copy {
             for enemy in logic.enemies_mut() {
-                if enemy.pos() == bullet.pos() && mind_control {
-                    enemy.mind_control();
+                if enemy.pos() == bullet.pos() {
+                    if mind_control {
+                        enemy.mind_control();
+                    }
+                    if numb {
+                        enemy.set_numb();
+                    }
                 }
             }
-            if !mind_control {
+            if !mind_control && !numb {
                 logic.enemies.retain(|enemy| enemy.pos() != bullet.pos());
             }
         }
 
+        // With the Effect::Numb, enemies may collide with each other
+        logic.enemies_mut().retain(|other| {
+            let mut count = 0;
+            for enemy in &enemies_copy {
+                if other.pos() == enemy.pos() {
+                    count += 1;
+                }
+            }
+            count == 1
+        });
+
         if !Handle::power(logic, &Effect::Pierce) {
-            for enemy in enemies_copy {
+            for enemy in &enemies_copy {
                 logic.player.bullets_mut().retain(|bullet| {
                     if bullet.pos() == enemy.pos() {
                         exploding_bullets.push(bullet.clone());
