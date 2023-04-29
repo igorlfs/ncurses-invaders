@@ -72,6 +72,24 @@ impl Handle {
         }
     }
 
+    pub fn yields(logic: &mut Logic) {
+        logic.yield_counter -= 1;
+
+        // We need to store the previous direction so we can restore
+        if logic.dir != Direction::Up {
+            logic.last_dir = Some(logic.dir);
+        }
+
+        logic.dir = Direction::Up;
+
+        // Restore previous direction
+        if logic.yield_counter == 0 {
+            logic.dir = logic
+                .last_dir
+                .expect("Last direction is empty but has been called");
+        }
+    }
+
     pub fn ultra(logic: &mut Logic) {
         let player_pos = logic.player.pos();
         // When jumping, direction is reversed so we don't need to worry about changing direction,

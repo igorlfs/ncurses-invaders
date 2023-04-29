@@ -32,6 +32,7 @@ const FIRE_PROBABILITY: f32 = 0.05;
 const BOSS_PROPABILITY: f32 = 0.001;
 const SHIELDS: i32 = 13;
 const OBSTACLES: i32 = 4;
+const YIELDS: i32 = 4;
 const CHAR_PLAYER: u32 = '*' as u32;
 const CHAR_ENEMY: u32 = 'v' as u32;
 const CHAR_LASER: u32 = ':' as u32;
@@ -66,6 +67,8 @@ pub struct Logic {
     width: i32,
     dir: Direction,
     last_attack: Instant,
+    last_dir: Option<Direction>,
+    yield_counter: i32,
     cooldown_attack: Duration,
     score_increment: i32,
     xerox: Option<Shooter>,
@@ -90,6 +93,8 @@ impl Logic {
             width: x,
             dir: Direction::Right,
             last_attack: Instant::now(),
+            last_dir: None,
+            yield_counter: 0,
             cooldown_attack: ATTACK_COOLDOWN,
             score_increment: 0,
             slow_down: false,

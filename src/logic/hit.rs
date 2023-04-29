@@ -1,3 +1,4 @@
+use super::YIELDS;
 use super::{
     handle::Handle, Logic, BOSS_SCORE, CHAR_LASER, COLOR_LASER, ENEMY_SCORE, POWER_COOLDOWN,
 };
@@ -58,6 +59,7 @@ impl Hit {
     pub fn powers(logic: &mut Logic) {
         let mut ultra = false;
         let mut clear = false;
+        let mut yields = false;
         for bullet in logic.player.bullets() {
             logic.powers.retain(|power| {
                 if power.pos() != bullet.pos() {
@@ -68,6 +70,8 @@ impl Hit {
                         clear = true;
                     } else if effect == Effect::Ultra {
                         ultra = true;
+                    } else if effect == Effect::Yield {
+                        yields = true;
                     } else {
                         logic.effects.insert(effect, Instant::now());
                     }
@@ -82,6 +86,9 @@ impl Hit {
         }
         if ultra {
             Handle::ultra(logic);
+        }
+        if yields {
+            logic.yield_counter = YIELDS;
         }
     }
 

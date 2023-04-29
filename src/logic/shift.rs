@@ -88,7 +88,12 @@ impl Move {
         if !Handle::power(logic, &Effect::Lock) {
             let (left, right) = get_outermost_lateral_indexes(&logic.enemies);
 
-            if logic.dir == Direction::Right && logic.enemies[right].pos().1 == logic.width - 2
+            if logic.enemies.is_empty() {
+                logic.dir = Direction::Left;
+            } else if logic.yield_counter > 0 {
+                Handle::yields(logic);
+            } else if logic.dir == Direction::Right
+                && logic.enemies[right].pos().1 == logic.width - 2
                 || logic.enemies[left].pos().1 == 1 && logic.dir == Direction::Left
             {
                 logic.dir = Direction::Down;
