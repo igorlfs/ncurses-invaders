@@ -34,7 +34,7 @@ impl Generate {
     }
 
     pub fn shields(logic: &mut Logic) {
-        let shield = Handle::power(logic, &Effect::Shield);
+        let shield = Handle::power(&logic.effects, &Effect::Shield);
         if shield && logic.shields.is_empty() {
             for i in 0..SHIELDS {
                 logic.shields.push(Shield::new(
@@ -48,7 +48,7 @@ impl Generate {
     }
 
     pub fn obstacles(logic: &mut Logic) {
-        let obstacle = Handle::power(logic, &Effect::Obstacle);
+        let obstacle = Handle::power(&logic.effects, &Effect::Obstacle);
         if obstacle && logic.obstacles.is_empty() {
             for i in 0..OBSTACLES {
                 logic.obstacles.push(Shield::new(
@@ -62,7 +62,7 @@ impl Generate {
     }
 
     pub fn xerox(logic: &mut Logic) {
-        let xerox = Handle::power(logic, &Effect::Xerox);
+        let xerox = Handle::power(&logic.effects, &Effect::Xerox);
         if logic.xerox.is_none() && xerox {
             let player_pos = logic.player.pos();
             let y = logic.width - player_pos.1;
@@ -77,8 +77,8 @@ impl Generate {
     }
 
     pub fn follower(logic: &mut Logic) {
-        let follower = Handle::power(logic, &Effect::Follower);
-        if Handle::power(logic, &Effect::Follower) && logic.follower.is_none() {
+        let follower = Handle::power(&logic.effects, &Effect::Follower);
+        if Handle::power(&logic.effects, &Effect::Follower) && logic.follower.is_none() {
             let player_x = logic.player().pos().1;
             logic.follower = Some(Shield::new(
                 (logic.height - 3, player_x),
@@ -108,7 +108,7 @@ impl Generate {
     }
 
     pub fn enemy_attack(logic: &mut Logic) {
-        if !Handle::power(logic, &Effect::Hijack) {
+        if !Handle::power(&logic.effects, &Effect::Hijack) {
             for enemy in logic.enemies.iter_mut() {
                 if util::random_event(FIRE_PROBABILITY) {
                     if enemy.is_mind_controlled() {

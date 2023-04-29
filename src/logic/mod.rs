@@ -107,8 +107,9 @@ impl Logic {
     }
 
     pub fn player_shoot(&mut self) {
-        self.player.set_revert(Handle::power(self, &Effect::Jump));
-        let cooldown = if Handle::power(self, &Effect::Quickshot) {
+        self.player
+            .set_revert(Handle::power(&self.effects, &Effect::Jump));
+        let cooldown = if Handle::power(&self.effects, &Effect::Quickshot) {
             self.cooldown_attack / 2
         } else {
             self.cooldown_attack
@@ -116,7 +117,7 @@ impl Logic {
         if self.last_attack.elapsed() >= cooldown {
             self.player.shoot(
                 Direction::Up,
-                Handle::power(self, &Effect::Grenade),
+                Handle::power(&self.effects, &Effect::Grenade),
                 CHAR_BULLET,
                 COLOR_BULLET,
             );

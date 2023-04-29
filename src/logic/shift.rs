@@ -16,7 +16,7 @@ impl Move {
 
     pub fn player(logic: &mut Logic, direction: &Direction) {
         let new_pos = logic.player.new_pos(direction);
-        let warp = Handle::power(logic, &Effect::Warp) && util::out_of_bounds(new_pos);
+        let warp = Handle::power(&logic.effects, &Effect::Warp) && util::out_of_bounds(new_pos);
 
         if *direction == Direction::Left && warp {
             logic.player.set_pos((logic.height - 2, logic.width - 2));
@@ -43,7 +43,7 @@ impl Move {
     }
 
     pub fn foes(logic: &mut Logic) -> bool {
-        if Handle::power(logic, &Effect::Zombify) {
+        if Handle::power(&logic.effects, &Effect::Zombify) {
             logic.slow_down = !logic.slow_down;
         } else {
             logic.slow_down = false;
@@ -66,7 +66,7 @@ impl Move {
     }
 
     pub fn bullets(logic: &mut Logic) {
-        let reflect = Handle::power(logic, &Effect::Reflect);
+        let reflect = Handle::power(&logic.effects, &Effect::Reflect);
         for bullet in logic.player.bullets_mut() {
             bullet.shift();
             if util::out_of_bounds(bullet.pos()) && reflect {
@@ -85,7 +85,7 @@ impl Move {
     }
 
     pub fn enemies(logic: &mut Logic) -> bool {
-        if !Handle::power(logic, &Effect::Lock) {
+        if !Handle::power(&logic.effects, &Effect::Lock) {
             let (left, right) = get_outermost_lateral_indexes(&logic.enemies);
 
             if logic.enemies.is_empty() {
@@ -105,7 +105,9 @@ impl Move {
                 logic.dir = Direction::Right;
             }
 
-            if !(logic.dir == Direction::Down) || !Handle::power(logic, &Effect::Antigravity) {
+            if !(logic.dir == Direction::Down)
+                || !Handle::power(&logic.effects, &Effect::Antigravity)
+            {
                 for enemy in logic.enemies.iter_mut() {
                     if !enemy.is_numb() {
                         enemy.shift(&logic.dir);

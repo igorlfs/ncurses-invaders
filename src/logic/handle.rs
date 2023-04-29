@@ -1,3 +1,6 @@
+use std::collections::HashMap;
+use std::time::Instant;
+
 use crate::object::Object;
 use crate::shooter::Shooter;
 use crate::{direction::Direction, power::Effect};
@@ -10,8 +13,8 @@ use super::{
 pub struct Handle;
 
 impl Handle {
-    pub fn power(logic: &Logic, effect: &Effect) -> bool {
-        if let Some(time) = logic.effects.get(effect) {
+    pub fn power(effects: &HashMap<Effect, Instant>, effect: &Effect) -> bool {
+        if let Some(time) = effects.get(effect) {
             if time.elapsed() < POWER_COOLDOWN {
                 return true;
             }
@@ -20,20 +23,20 @@ impl Handle {
     }
 
     pub fn mind_control(logic: &mut Logic) {
-        if !Handle::power(logic, &Effect::Mindcontrol) {
+        if !Handle::power(&logic.effects, &Effect::Mindcontrol) {
             logic.enemies.retain(|enemy| !enemy.is_mind_controlled())
         }
     }
 
     fn double(logic: &mut Logic) {
-        if Handle::power(logic, &Effect::Double) {
+        if Handle::power(&logic.effects, &Effect::Double) {
             logic.cooldown_attack = DOUBLE_ATTACK_COOLDOWN;
             let player_pos = logic.player.pos();
             let pos = (player_pos.0 - 1, player_pos.1);
             logic.player.shoot_pos(
                 &pos,
                 Direction::Up,
-                Handle::power(logic, &Effect::Grenade),
+                Handle::power(&logic.effects, &Effect::Grenade),
                 CHAR_BULLET,
                 COLOR_BULLET,
             );
@@ -41,11 +44,11 @@ impl Handle {
     }
 
     fn triple(logic: &mut Logic) {
-        if Handle::power(logic, &Effect::Triple) {
+        if Handle::power(&logic.effects, &Effect::Triple) {
             logic.cooldown_attack = TRIPLE_ATTACK_COOLDOWN;
             let player_pos = logic.player.pos();
             let pos_left = (player_pos.0 - 1, player_pos.1 + 1);
-            let grenade = Handle::power(logic, &Effect::Grenade);
+            let grenade = Handle::power(&logic.effects, &Effect::Grenade);
             logic.player.shoot_pos(
                 &pos_left,
                 Direction::LeftUp,
@@ -66,7 +69,7 @@ impl Handle {
 
     pub fn jump(logic: &mut Logic) {
         let player_pos = logic.player.pos();
-        if Handle::power(logic, &Effect::Jump) {
+        if Handle::power(&logic.effects, &Effect::Jump) {
             logic.player.set_pos((3, player_pos.1));
         } else {
             logic.player.set_pos((logic.height - 2, player_pos.1));
@@ -105,17 +108,17 @@ impl Handle {
         }
     }
 
-    pub fn ultra(logic: &mut Logic) {
-        let player_pos = logic.player.pos();
+    pub fn ultra(player: &mut Shooter, effects: &HashMap<Effect, Instant>, height: &i32) {
+        let player_pos = player.pos();
         // When jumping, direction is reversed so we don't need to worry about changing direction,
         // only the range
-        let range = if Handle::power(logic, &Effect::Jump) {
-            player_pos.0 + 1..logic.height - 1
+        let range = if Handle::power(effects, &Effect::Jump) {
+            player_pos.0 + 1..height - 1
         } else {
             3..player_pos.0
         };
         for i in range {
-            logic.player.shoot_pos(
+            player.shoot_pos(
                 &(i, player_pos.1),
                 Direction::Up,
                 false,
@@ -127,7 +130,7 @@ impl Handle {
 
     pub fn attack(logic: &mut Logic) {
         if let Some(xerox) = &logic.xerox {
-            let dir = if Handle::power(logic, &Effect::Jump) {
+            let dir = if Handle::power(&logic.effects, &Effect::Jump) {
                 Direction::Down
             } else {
                 Direction::Up
@@ -138,8 +141,8 @@ impl Handle {
         }
         Handle::double(logic);
         Handle::triple(logic);
-        let double = Handle::power(logic, &Effect::Double);
-        let triple = Handle::power(logic, &Effect::Triple);
+        let double = Handle::power(&logic.effects, &Effect::Double);
+        let triple = Handle::power(&logic.effects, &Effect::Triple);
         if double && triple {
             logic.cooldown_attack = COMBINED_ATTACK_COOLDOWN;
         }

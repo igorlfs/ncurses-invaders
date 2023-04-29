@@ -12,7 +12,7 @@ impl Hit {
     pub fn player(logic: &mut Logic) -> bool {
         let enemies_copy = logic.enemies.to_vec();
 
-        if Handle::power(logic, &Effect::Vendetta) {
+        if Handle::power(&logic.effects, &Effect::Vendetta) {
             logic.enemies.retain(|enemy| {
                 let mut retain = true;
                 for bullet in enemy.bullets() {
@@ -24,7 +24,7 @@ impl Hit {
             })
         }
 
-        if !Handle::power(logic, &Effect::Invincible) {
+        if !Handle::power(&logic.effects, &Effect::Invincible) {
             for enemy in enemies_copy {
                 for bullet in enemy.bullets() {
                     if bullet.pos() == logic.player.pos() {
@@ -57,8 +57,8 @@ impl Hit {
     }
 
     pub fn powers(logic: &mut Logic) {
-        let mut ultra = false;
-        for bullet in logic.player.bullets() {
+        let bullets = logic.player.bullets().to_owned();
+        for bullet in bullets {
             logic.powers.retain(|power| {
                 if power.pos() != bullet.pos() {
                     true
@@ -67,7 +67,7 @@ impl Hit {
                     if effect == Effect::Clear {
                         Handle::clear(&mut logic.enemies);
                     } else if effect == Effect::Ultra {
-                        ultra = true;
+                        Handle::ultra(&mut logic.player, &logic.effects, &logic.height);
                     } else if effect == Effect::Yield {
                         logic.yield_counter = YIELDS;
                     } else if effect == Effect::Explode {
@@ -78,9 +78,6 @@ impl Hit {
                     false
                 }
             });
-        }
-        if ultra {
-            Handle::ultra(logic);
         }
     }
 
@@ -148,8 +145,8 @@ impl Hit {
     pub fn enemies(logic: &mut Logic) -> usize {
         let previous_size = logic.enemies.len();
         let enemies_copy = logic.enemies.to_vec();
-        let mind_control = Handle::power(logic, &Effect::Mindcontrol);
-        let numb = Handle::power(logic, &Effect::Numb);
+        let mind_control = Handle::power(&logic.effects, &Effect::Mindcontrol);
+        let numb = Handle::power(&logic.effects, &Effect::Numb);
         let player_bullets_copy = logic.player.bullets().clone();
         let mut exploding_bullets: Vec<Bullet> = vec![];
         for bullet in player_bullets_copy {
@@ -179,7 +176,7 @@ impl Hit {
             count == 1
         });
 
-        if !Handle::power(logic, &Effect::Pierce) {
+        if !Handle::power(&logic.effects, &Effect::Pierce) {
             for enemy in &enemies_copy {
                 logic.player.bullets_mut().retain(|bullet| {
                     if bullet.pos() == enemy.pos() {
@@ -230,7 +227,7 @@ impl Hit {
     }
 
     pub fn targets(logic: &mut Logic, level: &i32) {
-        if Handle::power(logic, &Effect::Block) {
+        if Handle::power(&logic.effects, &Effect::Block) {
             Hit::lasers(logic);
         }
         if Hit::boss(logic) {
