@@ -1,4 +1,5 @@
 use crate::object::Object;
+use crate::shooter::Shooter;
 use crate::{direction::Direction, power::Effect};
 
 use super::{
@@ -87,6 +88,20 @@ impl Handle {
             logic.dir = logic
                 .last_dir
                 .expect("Last direction is empty but has been called");
+        }
+    }
+
+    pub fn explode(bomb: &(i32, i32), enemies: &mut Vec<Shooter>) {
+        enemies.retain(|enemy| {
+            let pos = enemy.pos();
+            !((pos.0 >= bomb.0 - 2 && pos.0 <= bomb.0 + 2)
+                && (pos.1 >= bomb.1 - 2 && pos.1 <= bomb.1 + 2))
+        })
+    }
+
+    pub fn clear(enemies: &mut [Shooter]) {
+        for enemy in enemies.iter_mut() {
+            enemy.bullets_mut().clear();
         }
     }
 

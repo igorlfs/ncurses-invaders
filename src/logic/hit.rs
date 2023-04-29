@@ -58,8 +58,6 @@ impl Hit {
 
     pub fn powers(logic: &mut Logic) {
         let mut ultra = false;
-        let mut clear = false;
-        let mut yields = false;
         for bullet in logic.player.bullets() {
             logic.powers.retain(|power| {
                 if power.pos() != bullet.pos() {
@@ -67,11 +65,13 @@ impl Hit {
                 } else {
                     let effect = *power.effect();
                     if effect == Effect::Clear {
-                        clear = true;
+                        Handle::clear(&mut logic.enemies);
                     } else if effect == Effect::Ultra {
                         ultra = true;
                     } else if effect == Effect::Yield {
-                        yields = true;
+                        logic.yield_counter = YIELDS;
+                    } else if effect == Effect::Explode {
+                        Handle::explode(&power.pos(), &mut logic.enemies);
                     } else {
                         logic.effects.insert(effect, Instant::now());
                     }
@@ -79,16 +79,8 @@ impl Hit {
                 }
             });
         }
-        if clear {
-            for enemy in logic.enemies.iter_mut() {
-                enemy.bullets_mut().clear();
-            }
-        }
         if ultra {
             Handle::ultra(logic);
-        }
-        if yields {
-            logic.yield_counter = YIELDS;
         }
     }
 
