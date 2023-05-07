@@ -17,6 +17,7 @@ pub enum Effect {
     Hijack,
     Invincible,
     Jump,
+    Kamizake,
     Lock,
     Mindcontrol,
     Numb,
@@ -42,7 +43,7 @@ impl fmt::Display for Effect {
 
 impl Distribution<Effect> for Standard {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Effect {
-        match rng.gen_range(0..=24) {
+        match rng.gen_range(0..=25) {
             0 => Effect::Antigravity,
             1 => Effect::Block,
             2 => Effect::Clear,
@@ -53,20 +54,21 @@ impl Distribution<Effect> for Standard {
             7 => Effect::Hijack,
             8 => Effect::Invincible,
             9 => Effect::Jump,
-            10 => Effect::Lock,
-            11 => Effect::Mindcontrol,
-            12 => Effect::Numb,
-            13 => Effect::Obstacle,
-            14 => Effect::Pierce,
-            15 => Effect::Quickshot,
-            16 => Effect::Reflect,
-            17 => Effect::Shield,
-            18 => Effect::Triple,
-            19 => Effect::Ultra,
-            20 => Effect::Vendetta,
-            21 => Effect::Warp,
-            22 => Effect::Xerox,
-            23 => Effect::Yield,
+            10 => Effect::Kamizake,
+            11 => Effect::Lock,
+            12 => Effect::Mindcontrol,
+            13 => Effect::Numb,
+            14 => Effect::Obstacle,
+            15 => Effect::Pierce,
+            16 => Effect::Quickshot,
+            17 => Effect::Reflect,
+            18 => Effect::Shield,
+            19 => Effect::Triple,
+            20 => Effect::Ultra,
+            21 => Effect::Vendetta,
+            22 => Effect::Warp,
+            23 => Effect::Xerox,
+            24 => Effect::Yield,
             _ => Effect::Zombify,
         }
     }

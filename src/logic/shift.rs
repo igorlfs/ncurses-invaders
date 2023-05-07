@@ -19,9 +19,9 @@ impl Move {
         let warp = Handle::power(&logic.effects, &Effect::Warp) && util::out_of_bounds(new_pos);
 
         if *direction == Direction::Left && warp {
-            logic.player.set_pos((logic.height - 2, logic.width - 2));
+            logic.player.set_y(logic.width - 2);
         } else if *direction == Direction::Right && warp {
-            logic.player.set_pos((logic.height - 2, 1));
+            logic.player.set_y(1);
         } else {
             logic.player.shift(direction);
         }

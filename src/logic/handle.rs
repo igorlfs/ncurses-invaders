@@ -1,9 +1,9 @@
-use std::collections::HashMap;
-use std::time::Instant;
-
 use crate::object::Object;
 use crate::shooter::Shooter;
+use crate::util;
 use crate::{direction::Direction, power::Effect};
+use std::collections::HashMap;
+use std::time::Instant;
 
 use super::{
     Logic, ATTACK_COOLDOWN, CHAR_BULLET, CHAR_ULTRA, COLOR_BULLET, COLOR_ULTRA,
@@ -17,6 +17,35 @@ impl Handle {
         if let Some(time) = effects.get(effect) {
             if time.elapsed() < POWER_COOLDOWN {
                 return true;
+            }
+        }
+        false
+    }
+
+    pub fn kamizake(logic: &mut Logic) -> bool {
+        if Handle::power(&logic.effects, &Effect::Kamizake) {
+            let (height, dir) = if Handle::power(&logic.effects, &Effect::Jump) {
+                (3, &Direction::Down)
+            } else {
+                (logic.height - 2, &Direction::Up)
+            };
+            let new_pos = logic.player.new_pos(dir);
+            if util::out_of_bounds(new_pos) {
+                logic.player.set_x(height);
+                return true;
+            } else {
+                logic.player.shift(dir);
+                let mut exterminate = false;
+                for enemy in &logic.enemies {
+                    if enemy.pos() == logic.player.pos() {
+                        exterminate = true;
+                    }
+                }
+                if exterminate {
+                    logic.enemies.clear();
+                    logic.player.set_x(height);
+                }
+                return exterminate;
             }
         }
         false
@@ -68,11 +97,10 @@ impl Handle {
     }
 
     pub fn jump(logic: &mut Logic) {
-        let player_pos = logic.player.pos();
         if Handle::power(&logic.effects, &Effect::Jump) {
-            logic.player.set_pos((3, player_pos.1));
-        } else {
-            logic.player.set_pos((logic.height - 2, player_pos.1));
+            logic.player.set_x(3);
+        } else if !Handle::power(&logic.effects, &Effect::Kamizake) {
+            logic.player.set_x(logic.height - 2);
         }
     }
 

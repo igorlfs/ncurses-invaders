@@ -151,9 +151,10 @@ impl Logic {
         Move::foes(self)
     }
 
-    pub fn handle(&mut self) {
+    pub fn handle(&mut self) -> bool {
         Handle::jump(self);
         Handle::mind_control(self);
+        Handle::kamizake(self)
     }
 
     pub fn hit(&mut self, level: &i32) -> bool {

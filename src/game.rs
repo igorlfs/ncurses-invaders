@@ -65,7 +65,9 @@ impl Invaders {
             if self.gate.shift(&self.level) {
                 self.lives = -1;
             }
-            self.gate.handle();
+            if self.gate.handle() {
+                self.lives -= 1;
+            }
             if self.gate.hit(&self.level) {
                 self.lives -= 1;
             }

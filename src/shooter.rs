@@ -103,8 +103,8 @@ impl Shooter {
         self.is_mind_controlled = true;
     }
 
-    pub fn set_pos(&mut self, pos: (i32, i32)) {
-        self.pos = pos;
+    pub fn set_x(&mut self, x: i32) {
+        self.pos.0 = x;
     }
 
     pub fn set_y(&mut self, y: i32) {
